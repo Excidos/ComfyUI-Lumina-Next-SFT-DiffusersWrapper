@@ -1,0 +1,613 @@
+Python Version: 
+Python 3.11.6
+ 
+Installed Packages: 
+Package                           Version
+--------------------------------- --------------------
+absl-py                           2.1.0
+accelerate                        0.29.3
+addict                            2.4.0
+aeiou                             0.0.20
+aiofiles                          23.2.1
+aiohttp                           3.9.5
+aiolimiter                        1.1.0
+aioresponses                      0.7.6
+aiosignal                         1.3.1
+albumentations                    1.3.1
+altair                            5.2.0
+annotated-types                   0.6.0
+anthropic                         0.29.2
+antlr4-python3-runtime            4.9.3
+anyio                             4.2.0
+APScheduler                       3.10.1
+asn1crypto                        1.5.1
+asttokens                         2.4.1
+astunparse                        1.6.3
+attrdict                          2.0.1
+attrs                             23.2.0
+audioread                         3.0.1
+auto_gptq                         0.7.1
+autoawq                           0.2.3
+autoawq_kernels                   0.0.6
+av                                12.0.0
+awscli                            1.32.64
+Babel                             2.14.0
+backoff                           2.2.1
+beautifulsoup4                    4.12.3
+bitsandbytes                      0.43.1
+black                             24.3.0
+bleach                            6.1.0
+blend_modes                       2.1.0
+blind-watermark                   0.4.4
+bokeh                             3.4.1
+boto3                             1.34.139
+botocore                          1.34.139
+braceexpand                       0.1.7
+build                             1.1.1
+CacheControl                      0.14.0
+cachetools                        5.3.2
+certifi                           2023.7.22
+cffi                              1.16.0
+chardet                           4.0.0
+charset-normalizer                3.3.2
+cleo                              2.1.0
+click                             8.1.7
+clip                              1.0
+clip-interrogator                 0.6.0
+cmake                             3.28.1
+cohere                            5.5.8
+color-matcher                     0.5.0
+colorama                          0.4.4
+colorcet                          3.1.0
+coloredlogs                       15.0.1
+colorlog                          6.8.0
+colour-science                    0.4.4
+compel                            2.0.2
+contourpy                         1.2.0
+controlnet_aux                    0.0.7
+courlan                           1.2.0
+crashtest                         0.4.1
+cryptography                      42.0.0
+cssselect2                        0.7.0
+cstr                              0.1.0
+cycler                            0.10.0
+Cython                            3.0.0
+dataclasses-json                  0.6.4
+datasets                          2.18.0
+dateparser                        1.2.0
+ddt                               1.7.2
+decorator                         4.4.2
+decord                            0.6.0
+deepdiff                          6.7.1
+deepseek_vl                       1.0.0
+defusedxml                        0.7.1
+Deprecated                        1.2.14
+diffusers                         0.30.0.dev0
+dill                              0.3.8
+diskcache                         5.6.3
+distlib                           0.3.8
+distro                            1.9.0
+dnspython                         2.6.1
+docker                            7.1.0
+docker-pycreds                    0.4.0
+docstring-parser                  0.15
+docutils                          0.16
+duckduckgo_search                 6.1.9
+dulwich                           0.21.7
+dynamicprompts                    0.30.2
+easydict                          1.11
+einops                            0.8.0
+elevenlabs                        1.3.1
+embreex                           2.17.7.post4
+encodec                           0.1.1
+evalidate                         2.0.2
+Events                            0.5
+executing                         2.0.1
+facexlib                          0.3.0
+fairscale                         0.4.13
+fastapi                           0.109.0
+fastavro                          1.9.4
+fastcore                          1.5.29
+fastjsonschema                    2.19.1
+fastprogress                      1.0.3
+ffmpeg-python                     0.2.0
+ffmpy                             0.3.0
+filelock                          3.13.1
+filetype                          1.2.0
+fire                              0.5.0
+flash_attn                        2.5.9.post1
+flatbuffers                       23.5.26
+fonttools                         4.47.2
+frozenlist                        1.4.1
+fsspec                            2023.12.2
+ftfy                              6.1.3
+future                            1.0.0
+fvcore                            0.1.5.post20221221
+gast                              0.5.4
+gekko                             1.0.7
+ghp-import                        2.1.0
+gitdb                             4.0.11
+GitPython                         3.1.41
+glfw                              2.7.0
+glitch_this                       1.0.3
+google-ai-generativelanguage      0.4.0
+google-api-core                   2.17.1
+google-auth                       2.26.2
+google-auth-oauthlib              1.2.0
+google-generativeai               0.4.1
+google-pasta                      0.2.0
+googleapis-common-protos          1.62.0
+GPUtil                            1.4.0
+gradio                            4.15.0
+gradio_client                     0.8.1
+gray2color                        0.4.3
+greenlet                          3.0.3
+griffe                            0.40.1
+griptape                          0.27.2
+groq                              0.6.0
+grpcio                            1.62.0
+grpcio-status                     1.62.0
+h11                               0.14.0
+h5py                              3.10.0
+holoviews                         1.19.0
+htmldate                          1.8.1
+httpcore                          1.0.2
+httpx                             0.27.0
+httpx-sse                         0.4.0
+hub-sdk                           0.0.6
+huggingface-hub                   0.23.4
+humanfriendly                     10.0
+HyperPyYAML                       1.2.2
+idna                              2.10
+image-reward                      1.5
+imageio                           2.33.1
+imageio-ffmpeg                    0.4.9
+img2texture                       1.0.6
+importlib-metadata                7.0.1
+importlib-resources               6.1.1
+inference-cli                     0.9.13
+inference-gpu                     0.9.13
+inference-sdk                     0.9.17
+iniconfig                         2.0.0
+insightface                       0.7.3
+installer                         0.7.0
+intel-openmp                      2021.4.0
+iopath                            0.1.10
+ip-adapter                        0.1.0
+ipython                           8.22.2
+jaraco.classes                    3.3.1
+jaxtyping                         0.2.28
+jedi                              0.19.1
+Jinja2                            3.1.3
+jiter                             0.5.0
+jmespath                          1.0.1
+joblib                            1.3.2
+jsonschema                        4.21.0
+jsonschema-specifications         2023.12.1
+jusText                           3.0.1
+keras                             2.15.0
+keyring                           24.3.1
+kiui                              0.2.6
+kiwisolver                        1.4.5
+kornia                            0.7.3
+kornia_rs                         0.1.3
+lark                              1.1.9
+lark-parser                       0.12.0
+lazy_loader                       0.3
+libclang                          16.0.6
+librosa                           0.9.2
+lightning-utilities               0.10.0
+linkify-it-py                     2.0.3
+llama-cpp-agent                   0.0.17
+llama_cpp_python                  0.2.26+cu121
+llvmlite                          0.41.1
+lmdb                              1.4.1
+loguru                            0.7.2
+lpips                             0.1.4
+lxml                              5.2.2
+lxml_html_clean                   0.1.1
+mail-parser                       3.15.0
+mapbox-earcut                     1.0.1
+Markdown                          3.5.1
+markdown-it-py                    3.0.0
+markdownify                       0.11.6
+MarkupSafe                        2.1.3
+marqo                             3.6.0
+marshmallow                       3.21.1
+marshmallow-enum                  1.5.1
+matplotlib                        3.8.2
+matplotlib-inline                 0.1.6
+matrix-client                     0.4.0
+mdit-py-plugins                   0.4.1
+mdurl                             0.1.2
+mediapipe                         0.10.9
+mergedeep                         1.3.4
+mistralai                         0.1.6
+mkdocs                            1.5.3
+mkdocs-autorefs                   0.5.0
+mkdocs-material                   9.5.9
+mkdocs-material-extensions        1.3.1
+mkdocstrings                      0.24.0
+mkdocstrings-python               1.8.0
+mkl                               2021.4.0
+ml-dtypes                         0.2.0
+more-itertools                    10.2.0
+moviepy                           1.0.3
+mpmath                            1.3.0
+msgpack                           1.0.8
+msvc-runtime                      14.34.31931
+multidict                         6.0.4
+multiprocess                      0.70.16
+mypy-extensions                   1.0.0
+natsort                           8.4.0
+ndg-httpsclient                   0.5.1
+nerfacc                           0.5.3
+networkx                          3.2.1
+ninja                             1.11.1.1
+nltk                              3.8.1
+numba                             0.58.1
+numexpr                           2.8.8
+numpy                             1.25.2
+oauthlib                          3.2.2
+objprint                          0.2.3
+ollama                            0.2.1
+omegaconf                         2.3.0
+onnx                              1.15.0
+onnxruntime                       1.16.3
+onnxruntime-gpu                   1.15.1
+open-clip-torch                   2.24.0
+openai                            1.9.0
+openai-clip                       1.0.1
+openai-whisper                    20231117
+opencv-contrib-python             4.9.0.80
+opencv-python                     4.8.1.78
+opencv-python-headless            4.7.0.72
+opensearch-py                     2.6.0
+opt-einsum                        3.3.0
+ordered-set                       4.1.0
+orjson                            3.9.12
+packaging                         23.2
+paginate                          0.5.6
+pandas                            1.5.3
+panel                             1.4.4
+param                             2.1.0
+parameterized                     0.9.0
+parso                             0.8.3
+pathspec                          0.12.1
+pedalboard                        0.9.7
+peft                              0.7.1
+pendulum                          3.0.0
+pexpect                           4.9.0
+pgvector                          0.2.5
+piexif                            1.1.3
+pilgram                           1.2.1
+pillow                            10.4.0
+pinecone-client                   3.2.2
+pip                               24.0
+pixeloe                           0.0.4
+pkginfo                           1.10.0
+platformdirs                      4.1.0
+playwright                        1.45.0
+plotly                            5.22.0
+pluggy                            1.4.0
+plyfile                           1.0.3
+poetry                            1.8.2
+poetry-core                       1.9.0
+poetry-plugin-export              1.7.1
+pooch                             1.8.0
+portalocker                       2.8.2
+prettytable                       3.9.0
+proglog                           0.1.10
+prometheus_client                 0.20.0
+prometheus-fastapi-instrumentator 6.0.0
+prompt-toolkit                    3.0.43
+proto-plus                        1.23.0
+protobuf                          4.25.3
+psutil                            6.0.0
+psycopg2-binary                   2.9.9
+ptyprocess                        0.7.0
+PuLP                              2.8.0
+pure-eval                         0.2.2
+pusher                            3.3.2
+py-cpuinfo                        3.3.0
+pyarrow                           15.0.1
+pyarrow-hotfix                    0.6
+pyasn1                            0.5.1
+pyasn1-modules                    0.3.0
+pybase64                          1.3.2
+pybboxes                          0.1.6
+pycocoevalcap                     1.2
+pycocotools                       2.0.7
+pycollada                         0.8
+pycparser                         2.21
+pycryptodome                      3.20.0
+pydantic                          2.5.3
+pydantic_core                     2.14.6
+pyDeprecate                       0.3.2
+pydub                             0.25.1
+pyee                              11.1.0
+pygit2                            1.15.0
+PyGithub                          2.3.0
+pygltflib                         1.16.2
+Pygments                          2.17.2
+pyhocon                           0.3.60
+PyJWT                             2.8.0
+PyMatting                         1.1.12
+PyMCubes                          0.1.4
+pymdown-extensions                10.7
+pymeshlab                         2023.12.post1
+pymongo                           4.8.0
+PyMuPDF                           1.23.8
+PyMuPDFb                          1.23.7
+PyNaCl                            1.5.0
+pynndescent                       0.5.13
+pynvml                            11.5.0
+PyOpenGL                          3.1.7
+pyOpenSSL                         24.0.0
+pyparsing                         3.1.1
+pypdf                             3.17.4
+PyPDF2                            3.0.1
+pypng                             0.20220715.0
+pyproject_hooks                   1.0.0
+pyreadline3                       3.4.1
+pyreqwest_impersonate             0.4.9
+pySmartDL                         1.3.4
+pytest                            8.1.1
+pytest-asyncio                    0.21.1
+python-dateutil                   2.8.2
+python-docx                       1.1.0
+python-dotenv                     1.0.1
+python-magic                      0.4.27
+python-multipart                  0.0.6
+pytorch-lightning                 2.3.2
+pytorch-msssim                    1.0.0
+pytz                              2023.3.post1
+pyviz_comms                       3.0.2
+PyWavelets                        1.5.0
+pywin32                           306
+pywin32-ctypes                    0.2.2
+PyYAML                            6.0.1
+pyyaml_env_tag                    0.1
+pyzbar                            0.1.9
+qrcode                            7.4.2
+qudida                            0.0.4
+rapidfuzz                         3.7.0
+redis                             4.6.0
+referencing                       0.32.1
+regex                             2023.12.25
+rembg                             2.0.53
+reportlab                         4.0.9
+requests                          2.31.0
+requests-oauthlib                 1.3.1
+requests-toolbelt                 1.0.0
+requirements-parser               0.5.0
+resampy                           0.4.3
+rf-clip                           1.0
+rich                              13.5.2
+rich-argparse                     1.4.0
+roboflow                          1.1.26
+roma                              1.4.4
+rouge                             1.0.1
+rpds-py                           0.17.1
+rsa                               4.7.2
+Rtree                             1.1.0
+ruamel.yaml                       0.18.6
+ruamel.yaml.clib                  0.2.8
+ruff                              0.1.13
+s3transfer                        0.10.1
+safetensors                       0.4.3
+sahi                              0.11.15
+schema                            0.7.7
+scikit-build                      0.17.6
+scikit-image                      0.20.0
+scikit-learn                      1.3.2
+scipy                             1.14.0
+seaborn                           0.13.1
+segment-anything                  1.0
+semantic-version                  2.10.0
+sentence-transformers             3.0.1
+sentencepiece                     0.2.0
+sentry-sdk                        2.6.0
+setproctitle                      1.3.3
+setuptools                        69.0.3
+shapely                           2.0.1
+shellingham                       1.5.4
+simple-lama-inpainting            0.1.2
+simpleeval                        0.9.13
+simplejson                        3.19.2
+six                               1.16.0
+skypilot                          0.4.1
+smmap                             5.0.1
+sniffio                           1.3.0
+snowflake-connector-python        3.11.0
+snowflake-sqlalchemy              1.5.3
+sortedcontainers                  2.4.0
+sounddevice                       0.4.6
+soundfile                         0.12.1
+soupsieve                         2.5
+soxr                              0.3.7
+spaces                            0.19.4
+spandrel                          0.3.4
+speechbrain                       0.5.16
+SQLAlchemy                        1.4.52
+sqlalchemy-redshift               0.8.14
+stack-data                        0.6.3
+starlette                         0.35.1
+stringcase                        1.2.0
+supervision                       0.19.0
+svg.path                          6.3
+svglib                            1.5.1
+sympy                             1.12
+symusic                           0.4.4
+tabulate                          0.9.0
+tb-nightly                        2.16.0a20240212
+tbb                               2021.12.0
+tenacity                          8.4.1
+tensorboard                       2.15.1
+tensorboard-data-server           0.7.2
+tensorflow                        2.15.0
+tensorflow-estimator              2.15.0
+tensorflow-intel                  2.15.0
+tensorflow-io-gcs-filesystem      0.31.0
+termcolor                         2.4.0
+terminaltables                    3.1.10
+tf_keras-nightly                  2.16.0.dev2024021210
+thop                              0.1.1.post2209072238
+threadpoolctl                     3.2.0
+tifffile                          2023.12.9
+tiktoken                          0.7.0
+time-machine                      2.14.0
+timm                              0.9.16
+tinycss2                          1.2.1
+tld                               0.13
+tokenizers                        0.15.2
+tomli                             2.0.1
+tomlkit                           0.12.0
+toolz                             0.12.0
+torch                             2.3.1+cu121
+torchaudio                        2.3.1+cu121
+torchdiffeq                       0.2.4
+torchmetrics                      0.11.4
+torchsde                          0.2.6
+torchtyping                       0.1.4
+torchvision                       0.18.1+cu121
+tornado                           6.4.1
+tqdm                              4.66.4
+trafilatura                       1.11.0
+traitlets                         5.14.2
+trampoline                        0.1.2
+transformers                      4.38.2
+trimesh                           4.0.10
+trove-classifiers                 2024.3.3
+typeguard                         2.13.3
+typer                             0.9.0
+typer-config                      1.4.0
+types-requests                    2.31.0.6
+types-setuptools                  69.2.0.20240317
+types-urllib3                     1.26.25.14
+typing                            3.7.4.3
+typing_extensions                 4.9.0
+typing-inspect                    0.9.0
+tzdata                            2023.4
+tzlocal                           5.2
+uc-micro-py                       1.0.3
+ultralytics                       8.1.42
+ultralyticsplus                   0.1.0
+umap-learn                        0.5.6
+urllib3                           1.26.18
+uuid                              1.30
+uvicorn                           0.26.0
+varname                           0.13.0
+vhacdx                            0.0.5
+virtualenv                        20.25.1
+vocos                             0.1.0
+voyageai                          0.2.3
+wandb                             0.17.2
+watchdog                          3.0.0
+Wave                              0.0.2
+wcwidth                           0.2.13
+webdataset                        0.2.86
+webencodings                      0.5.1
+websocket-client                  1.7.0
+websockets                        11.0.3
+Werkzeug                          3.0.1
+wget                              3.2
+wheel                             0.42.0
+WhisperSpeech                     0.8
+win32-setctime                    1.1.0
+wrapt                             1.14.1
+xatlas                            0.0.9
+xformers                          0.0.26.post1
+xxhash                            3.4.1
+xyzservices                       2024.6.0
+yacs                              0.1.8
+yapf                              0.40.2
+yarl                              1.9.4
+zhipuai                           2.0.1
+zipp                              3.17.0
+zstandard                         0.22.0
+
+[notice] A new release of pip is available: 24.0 -> 24.1.2
+[notice] To update, run: pythonw.exe -m pip install --upgrade pip
+ 
+Environment Variables: 
+ACSetupSvcPort=23210
+ACSvcPort=17532
+ALLUSERSPROFILE=C:\ProgramData
+APPDATA=C:\Users\excid\AppData\Roaming
+ChocolateyInstall=C:\ProgramData\chocolatey
+ChocolateyLastPathUpdate=133533309149447280
+CommonProgramFiles=C:\Program Files\Common Files
+CommonProgramFiles(x86)=C:\Program Files (x86)\Common Files
+CommonProgramW6432=C:\Program Files\Common Files
+COMPUTERNAME=CARDIS
+ComSpec=C:\WINDOWS\system32\cmd.exe
+CONDA_BAT=C:\Users\excid\anaconda3\condabin\conda.bat
+CONDA_EXE=C:\Users\excid\anaconda3\Scripts\conda.exe
+CONDA_SHLVL=0
+CUDA_HOME=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin\nvcc.exe
+CUDA_PATH=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2
+CUDA_PATH_V11_7=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7
+CUDA_PATH_V11_8=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin
+CUDA_PATH_V12_1=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin
+CUDA_PATH_V12_2=C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2
+DriverData=C:\Windows\System32\Drivers\DriverData
+EFC_6292=1
+FPS_BROWSER_APP_PROFILE_STRING=Internet Explorer
+FPS_BROWSER_USER_PROFILE_STRING=Default
+GIT_LFS_PATH=C:\Program Files\Git LFS
+GROQ_API_KEY=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
+HF_HOME=F:\Cache
+HF_TOKEN=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
+HOMEDRIVE=C:
+HOMEPATH=\Users\excid
+huggingface_token=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
+KMP_BLOCKTIME=0
+LOCALAPPDATA=C:\Users\excid\AppData\Local
+LOGONSERVER=\\CARDIS
+MSMPI_BENCHMARKS=C:\Program Files\Microsoft MPI\Benchmarks\
+MSMPI_BIN=C:\Program Files\Microsoft MPI\Bin\
+NDI_RUNTIME_DIR_V2=C:\Program Files\NDI\NDI 5 Runtime\v5
+NDI_RUNTIME_DIR_V3=C:\Program Files\NDI\NDI 5 Runtime\v5
+NDI_RUNTIME_DIR_V4=C:\Program Files\NDI\NDI 5 Runtime\v5
+NDI_RUNTIME_DIR_V5=C:\Program Files\NDI\NDI 5 Runtime\v5
+NDI_SDK_DIR=C:\Program Files\NDI\NDI 5 SDK
+NUMBER_OF_PROCESSORS=16
+NVTOOLSEXT_PATH=C:\Program Files\NVIDIA Corporation\NvToolsExt\
+OLLAMA_MODELS=F:\Ollama
+OMP_WAIT_POLICY=PASSIVE
+OneDrive=C:\Users\excid\OneDrive
+OneDriveConsumer=C:\Users\excid\OneDrive
+OPENAI_API_KEY=
+OPENSSL_CONF=C:\Program Files\PostgreSQL\psqlODBC\etc\openssl.cnf
+OS=Windows_NT
+Path=C:\Users\excid\anaconda3\condabin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.2\libnvvp;C:\Program Files\Microsoft MPI\Bin\;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.8\libnvvp;C:\Program Files\ImageMagick-7.1.1-Q16-HDRI;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.1\libnvvp;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\bin;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.7\libnvvp;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\dotnet\;C:\Program Files\Git\cmd;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Users\excid\COLMAP-3.8-windows-cuda;C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.38.33130\bin\Hostx64\x64;C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.29.30133\bin\Hostx64\x64;C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v11.6;C:\Program Files\Git LFS;C:\Program Files\nodejs\;C:\ProgramData\chocolatey\bin;C:\Program Files\LLVM\bin;C:\Program Files\CMake\bin;C:\Program Files (x86)\Tesseract-OCR;C:\Program Files\Docker\Docker\resources\bin;C:\Program Files\eSpeak NG\;C:\Program Files (x86)\PDFtk\bin\;C:\Program Files (x86)\PDFtk Server\bin\;C:\Program Files\NVIDIA Corporation\Nsight Compute 2023.2.0\;C:\Users\excid\.cargo\bin;C:\Users\excid\AppData\Local\Programs\Python\Python310\Scripts\;C:\Users\excid\AppData\Local\Programs\Python\Python310\;C:\Users\excid\AppData\Local\Programs\Python\Python311\Scripts\;C:\Users\excid\AppData\Local\Programs\Python\Python311\;C:\Users\excid\AppData\Local\Microsoft\WindowsApps;C:\Users\excid\AppData\Local\Programs\Microsoft VS Code\bin;C:\ffmpeg\bin;C:\Program Files\NDI\NDI 5 Runtime\v5;C:\Users\excid\AppData\Roaming\npm;C:\Users\excid\AppData\Local\Programs\Ollama;C:\Users\excid\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin;C:\Users\excid\.bun\bin
+PATHEXT=.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH;.MSC
+PROCESSOR_ARCHITECTURE=AMD64
+PROCESSOR_IDENTIFIER=AMD64 Family 25 Model 33 Stepping 2, AuthenticAMD
+PROCESSOR_LEVEL=25
+PROCESSOR_REVISION=2102
+ProgramData=C:\ProgramData
+ProgramFiles=C:\Program Files
+ProgramFiles(x86)=C:\Program Files (x86)
+ProgramW6432=C:\Program Files
+PROMPT=$P$G
+PSModulePath=C:\Users\excid\Documents\WindowsPowerShell\Modules;C:\Users\excid\AppData\Local\Google\Cloud SDK\google-cloud-sdk\platform\PowerShell
+PUBLIC=C:\Users\Public
+PYTHON_PATH=K:\AI-Art\ComfyUI_windows_portable\python_embeded\pythonw.exe
+RlsSvcPort=22112
+SERPAPI_API_KEY=d3e0da41ed8cdf861ba4ef4b8c8bb294969544de
+SESSIONNAME=Console
+SystemDrive=C:
+SystemRoot=C:\WINDOWS
+TAVILY_API_KEY=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
+TEMP=C:\Users\excid\AppData\Local\Temp
+TESSDATA_PREFIX=C:\Program Files (x86)\Tesseract-OCR\tessdata
+TMP=C:\Users\excid\AppData\Local\Temp
+USERDOMAIN=CARDIS
+USERDOMAIN_ROAMINGPROFILE=CARDIS
+USERNAME=excid
+USERPROFILE=C:\Users\excid
+VBOX_HWVIRTEX_IGNORE_SVM_IN_USE=1
+VBOX_MSI_INSTALL_PATH=C:\Program Files\Oracle\VirtualBox\
+windir=C:\WINDOWS
