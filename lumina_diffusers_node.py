@@ -1,9 +1,10 @@
 import torch
-from diffusers import LuminaText2ImgPipeline
+from diffusers import LuminaText2ImgPipeline, FlowMatchEulerDiscreteScheduler
 import comfy.model_management as mm
 import os
 import numpy as np
 import traceback
+import math
 
 class LuminaDiffusersNode:
     @classmethod
@@ -13,12 +14,15 @@ class LuminaDiffusersNode:
                 "model_path": ("STRING", {"default": "Lumina-Next-SFT-diffusers"}),
                 "prompt": ("STRING", {"multiline": True}),
                 "negative_prompt": ("STRING", {"multiline": True}),
-                "num_inference_steps": ("INT", {"default": 50, "min": 1, "max": 200}),
-                "guidance_scale": ("FLOAT", {"default": 7.5, "min": 0.1, "max": 20.0}),
+                "num_inference_steps": ("INT", {"default": 30, "min": 1, "max": 200}),
+                "guidance_scale": ("FLOAT", {"default": 4.0, "min": 0.1, "max": 20.0}),
                 "width": ("INT", {"default": 1024, "min": 512, "max": 2048, "step": 64}),
                 "height": ("INT", {"default": 1024, "min": 512, "max": 2048, "step": 64}),
                 "seed": ("INT", {"default": -1}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4}),
+                "scaling_watershed": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1.0}),
+                "time_aware_scaling": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0}),
+                "context_drop_ratio": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 0.5}),
             }
         }
 
@@ -43,13 +47,26 @@ class LuminaDiffusersNode:
 
             print(f"Loading Lumina model from: {full_path}")
             self.pipe = LuminaText2ImgPipeline.from_pretrained(full_path, torch_dtype=dtype)
+            self.pipe.scheduler = FlowMatchEulerDiscreteScheduler.from_config(self.pipe.scheduler.config)
             self.pipe.to(device)
             print("Pipeline successfully loaded and moved to device.")
         except Exception as e:
             print(f"Error in load_model: {str(e)}")
             traceback.print_exc()
 
-    def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed, batch_size):
+    def apply_time_aware_scaling(self, transformer, scale_factor):
+        if hasattr(transformer, 'text_encoder'):
+            transformer.text_encoder.config.time_aware_scaling = scale_factor
+        if hasattr(transformer, 'unet'):
+            transformer.unet.config.time_aware_scaling = scale_factor
+
+    def apply_context_drop(self, transformer, drop_ratio):
+        if hasattr(transformer, 'text_encoder'):
+            transformer.text_encoder.config.context_drop_ratio = drop_ratio
+        if hasattr(transformer, 'unet'):
+            transformer.unet.config.context_drop_ratio = drop_ratio
+
+    def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed, batch_size, scaling_watershed, time_aware_scaling, context_drop_ratio):
         try:
             if self.pipe is None:
                 print("Pipeline not loaded. Attempting to load model.")
@@ -64,6 +81,16 @@ class LuminaDiffusersNode:
             if seed == -1:
                 seed = int.from_bytes(os.urandom(4), "big")
             generator = torch.Generator(device=device).manual_seed(seed)
+
+            # Prepare Lumina-specific kwargs
+            scale_factor = math.sqrt(width * height / 1024**2)
+            
+            # Modify the pipe's transformer to include Lumina-specific features
+            if hasattr(self.pipe, 'transformer'):
+                self.pipe.transformer.scale_factor = scale_factor
+                self.pipe.transformer.scale_watershed = scaling_watershed
+                self.apply_time_aware_scaling(self.pipe.transformer, time_aware_scaling)
+                self.apply_context_drop(self.pipe.transformer, context_drop_ratio)
 
             print(f"Starting generation with seed: {seed}")
             output = self.pipe(
@@ -87,14 +114,17 @@ class LuminaDiffusersNode:
             print(f"Permuted images shape: {images.shape}")
             print(f"Images min: {images.min()}, max: {images.max()}")
 
+            # Apply normalization
+            images = (images + 1) / 2  # Assuming the output is in the range [-1, 1]
             images = (images * 255).round().clamp(0, 255).to(torch.uint8)
             
             print(f"Final images shape: {images.shape}")
             print(f"Final images min: {images.min()}, max: {images.max()}")
 
-            # Latents generation (if needed)
-            latents = self.pipe.vae.encode(output.images).latent_dist.sample()
-            latents = latents * self.pipe.vae.config.scaling_factor
+            # Generate latents
+            with torch.no_grad():
+                latents = self.pipe.vae.encode(output.images.to(self.pipe.vae.dtype)).latent_dist.sample()
+                latents = latents * self.pipe.vae.config.scaling_factor
             
             print(f"Latents shape: {latents.shape}")
             print(f"Latents min: {latents.min()}, max: {latents.max()}")
