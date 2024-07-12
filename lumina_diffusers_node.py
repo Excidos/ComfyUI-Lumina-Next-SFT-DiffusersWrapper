@@ -3,12 +3,14 @@ from diffusers import LuminaText2ImgPipeline
 import comfy.model_management as mm
 import os
 import numpy as np
+import traceback
 
 class LuminaDiffusersNode:
     @classmethod
     def INPUT_TYPES(s):
         return {
             "required": {
+                "model_path": ("STRING", {"default": "Lumina-Next-SFT-diffusers"}),
                 "prompt": ("STRING", {"multiline": True}),
                 "negative_prompt": ("STRING", {"multiline": True}),
                 "num_inference_steps": ("INT", {"default": 50, "min": 1, "max": 200}),
@@ -27,27 +29,43 @@ class LuminaDiffusersNode:
     def __init__(self):
         self.pipe = None
 
-    def generate(self, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed, batch_size):
-        device = mm.get_torch_device()
-        
-        if self.pipe is None:
-            model_path = os.path.join(os.path.dirname(__file__), "Lumina-Next-SFT-diffusers")
-            if not os.path.exists(model_path):
-                print(f"Downloading Lumina model to: {model_path}")
-                self.pipe = LuminaText2ImgPipeline.from_pretrained("Alpha-VLLM/Lumina-Next-SFT-diffusers", torch_dtype=torch.float16)
-                self.pipe.save_pretrained(model_path)
-            else:
-                print(f"Loading Lumina model from: {model_path}")
-                self.pipe = LuminaText2ImgPipeline.from_pretrained(model_path, torch_dtype=torch.float16)
-            
-            self.pipe.to(device)
-
-        if seed == -1:
-            seed = int.from_bytes(os.urandom(4), "big")
-        generator = torch.Generator(device=device).manual_seed(seed)
-
+    def load_model(self, model_path):
         try:
-            # Generate images
+            device = mm.get_torch_device()
+            dtype = torch.bfloat16 if torch.cuda.is_available() and torch.cuda.is_bf16_supported() else torch.float32
+
+            print(f"Attempting to load Lumina model from: {model_path}")
+            print(f"Device: {device}, Dtype: {dtype}")
+
+            full_path = os.path.join(os.path.dirname(__file__), model_path)
+            if not os.path.exists(full_path):
+                raise ValueError(f"Model path does not exist: {full_path}")
+
+            print(f"Loading Lumina model from: {full_path}")
+            self.pipe = LuminaText2ImgPipeline.from_pretrained(full_path, torch_dtype=dtype)
+            self.pipe.to(device)
+            print("Pipeline successfully loaded and moved to device.")
+        except Exception as e:
+            print(f"Error in load_model: {str(e)}")
+            traceback.print_exc()
+
+    def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed, batch_size):
+        try:
+            if self.pipe is None:
+                print("Pipeline not loaded. Attempting to load model.")
+                self.load_model(model_path)
+
+            if self.pipe is None:
+                raise ValueError("Failed to load the pipeline.")
+
+            device = mm.get_torch_device()
+            print(f"Generation device: {device}")
+
+            if seed == -1:
+                seed = int.from_bytes(os.urandom(4), "big")
+            generator = torch.Generator(device=device).manual_seed(seed)
+
+            print(f"Starting generation with seed: {seed}")
             output = self.pipe(
                 prompt=[prompt] * batch_size,
                 negative_prompt=[negative_prompt] * batch_size,
@@ -60,40 +78,34 @@ class LuminaDiffusersNode:
                 output_type="pt",
             )
 
-            # Debug: Print raw output
             print(f"Raw output shape: {output.images.shape}")
             print(f"Raw output min: {output.images.min()}, max: {output.images.max()}")
 
-            # Extract images and convert to the format ComfyUI expects
             images = output.images
             images = images.permute(0, 2, 3, 1).cpu()
             
-            # Debug: Print intermediate values
             print(f"Permuted images shape: {images.shape}")
             print(f"Images min: {images.min()}, max: {images.max()}")
 
             images = (images * 255).round().clamp(0, 255).to(torch.uint8)
             
-            # Debug: Print final image values
             print(f"Final images shape: {images.shape}")
             print(f"Final images min: {images.min()}, max: {images.max()}")
 
-            # Generate latents
+            # Latents generation (if needed)
             latents = self.pipe.vae.encode(output.images).latent_dist.sample()
             latents = latents * self.pipe.vae.config.scaling_factor
             
-            # Debug: Print latent values
             print(f"Latents shape: {latents.shape}")
             print(f"Latents min: {latents.min()}, max: {latents.max()}")
 
-            # Prepare latents for ComfyUI
             latents_for_comfy = {"samples": latents.cpu()}
 
             return (images, latents_for_comfy)
 
         except Exception as e:
-            print(f"Error in Lumina generation: {str(e)}")
-            # Return empty tensors in case of error
+            print(f"Error in generate: {str(e)}")
+            traceback.print_exc()
             return (torch.zeros((batch_size, height, width, 3), dtype=torch.uint8), 
                     {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
 
