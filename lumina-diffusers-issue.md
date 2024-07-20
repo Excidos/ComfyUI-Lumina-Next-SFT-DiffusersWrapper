@@ -71,13 +71,16 @@ def process_output(self, images):
 
 ## ComfyUI Workflow
 
-![ComfyUI Workflow](https://raw.githubusercontent.com/username/repo/main/images/comfyui_workflow.png)
+![image](https://github.com/user-attachments/assets/1ccad406-a902-419a-9fde-5971c82fcef6)
 
 ## Debug Output
 
+![debug_output](https://github.com/user-attachments/assets/084e3dc3-6d35-4b79-8d31-7b662d9b8b3f)
+
+
 The `debug_output.png` shows that the Lumina wrapper model is generating a mostly coherent image:
 
-![Debug Output](https://raw.githubusercontent.com/username/repo/main/images/debug_output.png)
+
 
 ## Additional Information
 
