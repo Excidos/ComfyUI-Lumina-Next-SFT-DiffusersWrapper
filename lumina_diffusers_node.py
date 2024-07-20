@@ -119,30 +119,39 @@ class LuminaDiffusersNode:
                     {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
 
     def process_output(self, images):
+        print(f"Initial images shape and dtype: {images.shape}, {images.dtype}")
+        
+        # Ensure images are in the correct range [0, 1]
         images = (images + 1) / 2
         images = images.clamp(0, 1)
-        images = (images * 255).round().to(torch.uint8)
         
-        # Ensure correct shape: [batch_size, channels, height, width]
+        # Convert to uint8
+        images = (images * 255).round().to(torch.uint8)
+        print(f"After conversion to uint8: {images.shape}, {images.dtype}")
+        
+        # Move to CPU and convert to numpy
         images = images.cpu().numpy()
+        print(f"After conversion to numpy: {images.shape}, {images.dtype}")
         
         processed_images = []
         for img in images:
-            # Reshape if necessary
-            if img.shape[0] == 1:
-                img = img.squeeze(0)  # Remove batch dimension if it's 1
+            print(f"Processing image: {img.shape}, {img.dtype}")
             
             # Ensure the image is in the format [height, width, channels]
-            if img.ndim == 3 and img.shape[0] == 3:
+            if img.shape[0] == 3:
                 img = img.transpose(1, 2, 0)
-            
+            elif img.shape[0] == 1:
+                img = img.squeeze(0)
+                
+            print(f"After potential transpose: {img.shape}, {img.dtype}")
             processed_images.append(img)
         
         print(f"Processed images: {len(processed_images)}")
-        print(f"First image shape: {processed_images[0].shape}")
+        print(f"First image shape and dtype: {processed_images[0].shape}, {processed_images[0].dtype}")
         
-        # Convert to the format ComfyUI expects: [batch_size, channels, height, width]
+        # Convert back to torch tensor in the format ComfyUI expects
         comfy_images = torch.from_numpy(np.stack(processed_images)).permute(0, 3, 1, 2).float() / 255.0
+        print(f"Final comfy_images: {comfy_images.shape}, {comfy_images.dtype}")
         
         return comfy_images
 
