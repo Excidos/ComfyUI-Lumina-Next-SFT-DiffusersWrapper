@@ -2,13 +2,16 @@ import torch
 from diffusers import LuminaText2ImgPipeline, FlowMatchEulerDiscreteScheduler
 import comfy.model_management as mm
 import os
-import numpy as np
 import traceback
 import math
+import numpy as np
+from PIL import Image
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 class LuminaDiffusersNode:
     @classmethod
-    def INPUT_TYPES(s):
+    def INPUT_TYPES(cls):
         return {
             "required": {
                 "model_path": ("STRING", {"default": "Lumina-Next-SFT-diffusers"}),
@@ -54,17 +57,17 @@ class LuminaDiffusersNode:
             print(f"Error in load_model: {str(e)}")
             traceback.print_exc()
 
-    def apply_time_aware_scaling(self, transformer, scale_factor):
-        if hasattr(transformer, 'text_encoder'):
-            transformer.text_encoder.config.time_aware_scaling = scale_factor
-        if hasattr(transformer, 'unet'):
-            transformer.unet.config.time_aware_scaling = scale_factor
+    def apply_model_configurations(self, scale_factor, scaling_watershed, time_aware_scaling, context_drop_ratio):
+        if hasattr(self.pipe, 'transformer'):
+            self.pipe.transformer.scale_factor = scale_factor
+            self.pipe.transformer.scale_watershed = scaling_watershed
+            self._apply_config(self.pipe.transformer, 'time_aware_scaling', time_aware_scaling)
+            self._apply_config(self.pipe.transformer, 'context_drop_ratio', context_drop_ratio)
 
-    def apply_context_drop(self, transformer, drop_ratio):
-        if hasattr(transformer, 'text_encoder'):
-            transformer.text_encoder.config.context_drop_ratio = drop_ratio
-        if hasattr(transformer, 'unet'):
-            transformer.unet.config.context_drop_ratio = drop_ratio
+    def _apply_config(self, transformer, config_name, value):
+        for component in ['text_encoder', 'unet']:
+            if hasattr(transformer, component):
+                setattr(getattr(transformer, component).config, config_name, value)
 
     def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed, batch_size, scaling_watershed, time_aware_scaling, context_drop_ratio):
         try:
@@ -82,15 +85,8 @@ class LuminaDiffusersNode:
                 seed = int.from_bytes(os.urandom(4), "big")
             generator = torch.Generator(device=device).manual_seed(seed)
 
-            # Prepare Lumina-specific kwargs
             scale_factor = math.sqrt(width * height / 1024**2)
-            
-            # Modify the pipe's transformer to include Lumina-specific features
-            if hasattr(self.pipe, 'transformer'):
-                self.pipe.transformer.scale_factor = scale_factor
-                self.pipe.transformer.scale_watershed = scaling_watershed
-                self.apply_time_aware_scaling(self.pipe.transformer, time_aware_scaling)
-                self.apply_context_drop(self.pipe.transformer, context_drop_ratio)
+            self.apply_model_configurations(scale_factor, scaling_watershed, time_aware_scaling, context_drop_ratio)
 
             print(f"Starting generation with seed: {seed}")
             output = self.pipe(
@@ -105,39 +101,60 @@ class LuminaDiffusersNode:
                 output_type="pt",
             )
 
-            print(f"Raw output shape: {output.images.shape}")
-            print(f"Raw output min: {output.images.min()}, max: {output.images.max()}")
+            images = self.process_output(output.images)
+            latents = self.generate_latents(output.images)
 
-            images = output.images
-            images = images.permute(0, 2, 3, 1).cpu()
-            
-            print(f"Permuted images shape: {images.shape}")
-            print(f"Images min: {images.min()}, max: {images.max()}")
+            # Save debug image
+            if images.shape[0] > 0:
+                debug_image = Image.fromarray((images[0].permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8))
+                debug_image.save("debug_output.png")
+                print("Debug image saved successfully.")
 
-            # Apply normalization
-            images = (images + 1) / 2  # Assuming the output is in the range [-1, 1]
-            images = (images * 255).round().clamp(0, 255).to(torch.uint8)
-            
-            print(f"Final images shape: {images.shape}")
-            print(f"Final images min: {images.min()}, max: {images.max()}")
-
-            # Generate latents
-            with torch.no_grad():
-                latents = self.pipe.vae.encode(output.images.to(self.pipe.vae.dtype)).latent_dist.sample()
-                latents = latents * self.pipe.vae.config.scaling_factor
-            
-            print(f"Latents shape: {latents.shape}")
-            print(f"Latents min: {latents.min()}, max: {latents.max()}")
-
-            latents_for_comfy = {"samples": latents.cpu()}
-
-            return (images, latents_for_comfy)
+            return (images, {"samples": latents.cpu()})
 
         except Exception as e:
             print(f"Error in generate: {str(e)}")
             traceback.print_exc()
-            return (torch.zeros((batch_size, height, width, 3), dtype=torch.uint8), 
+            return (torch.zeros((batch_size, 3, height, width), dtype=torch.float32), 
                     {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
+
+    def process_output(self, images):
+        images = (images + 1) / 2
+        images = images.clamp(0, 1)
+        images = (images * 255).round().to(torch.uint8)
+        
+        # Ensure correct shape: [batch_size, channels, height, width]
+        images = images.cpu().numpy()
+        
+        processed_images = []
+        for img in images:
+            # Reshape if necessary
+            if img.shape[0] == 1:
+                img = img.squeeze(0)  # Remove batch dimension if it's 1
+            
+            # Ensure the image is in the format [height, width, channels]
+            if img.ndim == 3 and img.shape[0] == 3:
+                img = img.transpose(1, 2, 0)
+            
+            processed_images.append(img)
+        
+        print(f"Processed images: {len(processed_images)}")
+        print(f"First image shape: {processed_images[0].shape}")
+        
+        # Convert to the format ComfyUI expects: [batch_size, channels, height, width]
+        comfy_images = torch.from_numpy(np.stack(processed_images)).permute(0, 3, 1, 2).float() / 255.0
+        
+        return comfy_images
+
+    def generate_latents(self, images):
+        with torch.no_grad():
+            latents = self.pipe.vae.encode(images.to(self.pipe.vae.dtype)).latent_dist.sample()
+            latents = latents * self.pipe.vae.config.scaling_factor
+        
+        print(f"Latents shape: {latents.shape}")
+        print(f"Latents min: {latents.min()}, max: {latents.max()}")
+        
+        return latents
 
 NODE_CLASS_MAPPINGS = {
     "LuminaDiffusersNode": LuminaDiffusersNode
