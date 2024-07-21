@@ -5,9 +5,6 @@ import os
 import traceback
 import math
 import numpy as np
-from PIL import Image
-
-device = "cuda" if torch.cuda.is_available() else "cpu"
 
 class LuminaDiffusersNode:
     @classmethod
@@ -24,12 +21,12 @@ class LuminaDiffusersNode:
                 "seed": ("INT", {"default": -1}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4}),
                 "scaling_watershed": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1.0}),
-                "time_aware_scaling": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 2.0}),
+                "time_aware_scaling": ("FLOAT", {"default": 4.0, "min": 0.1, "max": 20.0}),
                 "context_drop_ratio": ("FLOAT", {"default": 0.0, "min": 0.0, "max": 0.5}),
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT")
+    RETURN_TYPES = ("IMAGE",)
     FUNCTION = "generate"
     CATEGORY = "LuminaWrapper"
 
@@ -102,68 +99,34 @@ class LuminaDiffusersNode:
             )
 
             images = self.process_output(output.images)
-            latents = self.generate_latents(output.images)
 
-            # Save debug image
-            if images.shape[0] > 0:
-                debug_image = Image.fromarray((images[0].permute(1, 2, 0).cpu().numpy() * 255).astype(np.uint8))
-                debug_image.save("debug_output.png")
-                print("Debug image saved successfully.")
-
-            return (images, {"samples": latents.cpu()})
+            return (images,)
 
         except Exception as e:
             print(f"Error in generate: {str(e)}")
             traceback.print_exc()
-            return (torch.zeros((batch_size, 3, height, width), dtype=torch.float32), 
-                    {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
+            return (torch.zeros((batch_size, height, width, 3), dtype=torch.float32),)
 
     def process_output(self, images):
-        print(f"Initial images shape and dtype: {images.shape}, {images.dtype}")
-        
+        print(f"Raw output images shape: {images.shape}")
+        print(f"Raw output images dtype: {images.dtype}")
+        print(f"Raw output images min: {images.min()}, max: {images.max()}")
+
         # Ensure images are in the correct range [0, 1]
         images = (images + 1) / 2
         images = images.clamp(0, 1)
-        
-        # Convert to uint8
-        images = (images * 255).round().to(torch.uint8)
-        print(f"After conversion to uint8: {images.shape}, {images.dtype}")
-        
-        # Move to CPU and convert to numpy
-        images = images.cpu().numpy()
-        print(f"After conversion to numpy: {images.shape}, {images.dtype}")
-        
-        processed_images = []
-        for img in images:
-            print(f"Processing image: {img.shape}, {img.dtype}")
-            
-            # Ensure the image is in the format [height, width, channels]
-            if img.shape[0] == 3:
-                img = img.transpose(1, 2, 0)
-            elif img.shape[0] == 1:
-                img = img.squeeze(0)
-                
-            print(f"After potential transpose: {img.shape}, {img.dtype}")
-            processed_images.append(img)
-        
-        print(f"Processed images: {len(processed_images)}")
-        print(f"First image shape and dtype: {processed_images[0].shape}, {processed_images[0].dtype}")
-        
-        # Convert back to torch tensor in the format ComfyUI expects
-        comfy_images = torch.from_numpy(np.stack(processed_images)).permute(0, 3, 1, 2).float() / 255.0
-        print(f"Final comfy_images: {comfy_images.shape}, {comfy_images.dtype}")
-        
-        return comfy_images
 
-    def generate_latents(self, images):
-        with torch.no_grad():
-            latents = self.pipe.vae.encode(images.to(self.pipe.vae.dtype)).latent_dist.sample()
-            latents = latents * self.pipe.vae.config.scaling_factor
-        
-        print(f"Latents shape: {latents.shape}")
-        print(f"Latents min: {latents.min()}, max: {latents.max()}")
-        
-        return latents
+        # Convert to float32 if necessary
+        images = images.float()
+
+        # Ensure the shape is correct (batch, height, width, channels)
+        images = images.permute(0, 2, 3, 1)
+
+        print(f"Processed images shape: {images.shape}")
+        print(f"Processed images dtype: {images.dtype}")
+        print(f"Processed images min: {images.min()}, max: {images.max()}")
+
+        return images
 
 NODE_CLASS_MAPPINGS = {
     "LuminaDiffusersNode": LuminaDiffusersNode
