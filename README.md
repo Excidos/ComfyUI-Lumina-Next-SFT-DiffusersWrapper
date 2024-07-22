@@ -1,36 +1,38 @@
 # ComfyUI-Lumina-Next-SFT-DiffusersWrapper
 
-# Lumina Diffusers Node for ComfyUI
+## Lumina Diffusers Node for ComfyUI
 
-This custom node integrates the Lumina-Next-SFT model into ComfyUI, allowing for high-quality image generation using the Lumina text-to-image pipeline. Still a massive work in progress but functional.
+This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, enabling high-quality image generation using the advanced Lumina text-to-image pipeline. While still under active development, it offers a robust and functional implementation.
 
 ## Features
 
-- Utilizes the Lumina-Next-SFT model for image generation
-- Supports various generation parameters including prompt, negative prompt, inference steps, and guidance scale
-- Implements Lumina-specific features such as scaling watershed and proportional attention
-- Automatic model downloading if not found locally
+- Harnesses the power of the Lumina-Next-SFT model for state-of-the-art image generation
+- Offers a wide range of generation parameters for fine-tuned control
+- Implements Lumina-specific features including scaling watershed and proportional attention
+- Incorporates time-aware scaling for improved generation quality
+- Utilizes an ODE solver for enhanced stability and quality in the generation process
+- Automatic model downloading for seamless setup
 - Outputs both generated images and latent representations
 
 ## Installation
 
-1. Ensure you have ComfyUI installed and set up.
+1. Ensure you have ComfyUI installed and properly set up.
 2. Clone this repository into your ComfyUI custom nodes directory:
    ```
    git clone https://github.com/Excidos/ComfyUI-Lumina-Diffusers.git
    ```
-3. Dependencies will be automatically installed
+3. The required dependencies will be automatically installed.
 
-   NOTE: Will install a development branch of diffusers (may conflict with some nodes)
+   **NOTE:** This installation includes a development branch of diffusers, which may conflict with some existing nodes.
 
 ## Usage
 
-1. Start ComfyUI.
-2. Look for the "Lumina-Next-SFT Diffusers" node in the node selection menu.
+1. Launch ComfyUI.
+2. Locate the "Lumina-Next-SFT Diffusers" node in the node selection menu.
 3. Add the node to your workflow.
 4. Connect the necessary inputs and outputs.
 5. Configure the node parameters as desired.
-6. Run your workflow to generate images.
+6. Execute your workflow to generate images.
 
 ## Parameters
 
@@ -48,18 +50,22 @@ This custom node integrates the Lumina-Next-SFT model into ComfyUI, allowing for
 - `clean_caption`: Clean input captions (default: True)
 - `max_sequence_length`: Maximum sequence length for text input (default: 256)
 - `t_shift`: Time shift parameter for scheduler (default: 4)
+- `solver`: ODE solver type (options: "euler", "midpoint", "rk4", default: "midpoint")
 
 ## Outputs
 
 1. `IMAGE`: Generated image(s) in tensor format
-2. `LATENT`: Latent representation of the generated image(s) (Currently Not Working)
+2. `LATENT`: Latent representation of the generated image(s)
 
-## Notes
+## Advanced Features
 
-- The node will automatically download the Lumina model if it's not found in the specified path.
-- Ensure you have sufficient GPU memory for running the Lumina model.
-- This is my first Diffusers Wrapper and is a big work in progress.
+### Time-Aware Scaling
 
+The node now implements time-aware scaling, which adjusts the generation process based on the current timestep. This results in improved image quality, especially for high-resolution outputs.
+
+### ODE Solver
+
+An Ordinary Differential Equation (ODE) solver has been integrated into the generation process. This advanced technique enhances the stability and quality of the generated images, particularly for complex prompts or high-resolution outputs.
 ## Example Outputs
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
