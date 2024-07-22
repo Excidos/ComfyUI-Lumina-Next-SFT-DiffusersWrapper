@@ -16,6 +16,10 @@ This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, e
 
 ## Installation
 
+## Now in ComfyUI Manager!
+
+or for manual installation.
+
 1. Ensure you have ComfyUI installed and properly set up.
 2. Clone this repository into your ComfyUI custom nodes directory:
    ```
