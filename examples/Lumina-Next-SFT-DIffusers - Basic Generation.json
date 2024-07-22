@@ -1,0 +1,115 @@
+{
+  "last_node_id": 54,
+  "last_link_id": 71,
+  "nodes": [
+    {
+      "id": 54,
+      "type": "PreviewImage",
+      "pos": [
+        724,
+        600
+      ],
+      "size": [
+        890.161469686688,
+        928.9939134438525
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 70
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      }
+    },
+    {
+      "id": 1,
+      "type": "LuminaDiffusersNode",
+      "pos": [
+        247,
+        604
+      ],
+      "size": [
+        400,
+        502
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            70
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [],
+          "shape": 3,
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LuminaDiffusersNode"
+      },
+      "widgets_values": [
+        "Lumina-Next-SFT-diffusers",
+        "Landscape, night, solar eclipse, disappearance, special aura, detailed, chaotic drawing style",
+        "",
+        40,
+        4.5,
+        1024,
+        1024,
+        1858,
+        "randomize",
+        1,
+        0.30000000000000004,
+        true,
+        true,
+        256,
+        6,
+        "euler"
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    }
+  ],
+  "links": [
+    [
+      70,
+      1,
+      0,
+      54,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ds": {
+      "scale": 0.9646149645000074,
+      "offset": [
+        124.74378675409116,
+        -467.36554734100514
+      ]
+    }
+  },
+  "version": 0.4
+}
