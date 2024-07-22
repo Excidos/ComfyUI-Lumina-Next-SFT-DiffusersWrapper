@@ -1,0 +1,15 @@
+[project]
+name = "comfyui-lumina-next-sft-diffuserswrapper"
+description = "ComfyUI-Lumina-Next-SFT-DiffusersWrapper is a custom node for ComfyUI that integrates the advanced Lumina-Next-SFT model. It offers high-quality image generation with features like time-aware scaling, ODE sampling, and support for high-resolution outputs. This node brings the power of the Lumina text-to-image pipeline directly into ComfyUI workflows."
+version = "1.0.0"
+license = "LICENSE"
+dependencies = ["torch", "diffusers", "transformers", "torchdiffeq"]
+
+[project.urls]
+Repository = "https://github.com/Excidos/ComfyUI-Lumina-Next-SFT-DiffusersWrapper"
+#  Used by Comfy Registry https://comfyregistry.org
+
+[tool.comfy]
+PublisherId = "d9fd0ca0-fa6b-4902-b025-0e14d9283d6d"
+DisplayName = "ComfyUI-Lumina-Next-SFT-DiffusersWrapper"
+Icon = "https://imgur.com/a/jmt7W6y"
