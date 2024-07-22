@@ -64,9 +64,16 @@ This custom node integrates the Lumina-Next-SFT model into ComfyUI, allowing for
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
 
+![image](https://github.com/user-attachments/assets/e839fb67-851f-456d-aec7-e727b95dc968)
+
 ![Screenshot 2024-07-22 131142](https://github.com/user-attachments/assets/ffa516d6-cb72-4c51-bf19-e6c85b490cc3)
 
 ![Screenshot 2024-07-22 104629](https://github.com/user-attachments/assets/12cc7089-d7f7-42ae-8228-43b77f1e24fa)
+
+![image](https://github.com/user-attachments/assets/94e046e3-b39b-4b3c-ae7f-723b1c8af70f)
+
+
+
 
 ![image](https://github.com/user-attachments/assets/a0851ad1-10e8-4eca-9f1f-82ab94f60427)
 
