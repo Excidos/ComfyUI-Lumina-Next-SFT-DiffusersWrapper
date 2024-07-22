@@ -1,5 +1,7 @@
 import torch
-import math
+from torchdiffeq import odeint
+from comfy.utils import ProgressBar
+from tqdm import tqdm
 
 def get_2d_rotary_pos_embed_lumina(head_dim, height, width, linear_factor=1.0, ntk_factor=1.0):
     x = torch.arange(width).float() * linear_factor
@@ -21,19 +23,35 @@ def get_2d_rotary_pos_embed_lumina(head_dim, height, width, linear_factor=1.0, n
 
     return sin_pos, cos_pos
 
-def apply_time_aware_scaling(scheduler, timestep, scaling_watershed, scaling_factor):
-    if torch.is_tensor(timestep):
-        current_timestep = 1 - timestep / scheduler.config.num_train_timesteps
-        linear_factor = torch.where(current_timestep < scaling_watershed, scaling_factor, 1.0)
-        ntk_factor = torch.where(current_timestep < scaling_watershed, 1.0, scaling_factor)
-    else:
-        current_timestep = 1 - timestep / scheduler.config.num_train_timesteps
-        if current_timestep < scaling_watershed:
-            linear_factor = scaling_factor
-            ntk_factor = 1.0
+class ODE:
+    def __init__(self, num_steps, sampler_type="midpoint", time_shifting_factor=None, strength=1.0, t0=0.0, t1=1.0):
+        self.t = torch.linspace(t0, t1, num_steps)
+        if time_shifting_factor:
+            self.t = self.t / (self.t + time_shifting_factor - time_shifting_factor * self.t)
+
+        if strength != 1.0:
+            self.t = self.t[int(num_steps * (1 - strength)):]
+
+        self.sampler_type = sampler_type
+        if self.sampler_type == "euler":
+            total_steps = len(self.t)
         else:
-            linear_factor = 1.0
-            ntk_factor = scaling_factor
-        linear_factor = torch.tensor([linear_factor])
-        ntk_factor = torch.tensor([ntk_factor])
-    return linear_factor, ntk_factor
+            total_steps = (len(self.t) * 2) - 2
+        self.comfy_pbar = ProgressBar(total_steps)
+        self.pbar = tqdm(total=total_steps, desc='ODE Sampling')
+
+    def sample(self, model_fn, **model_kwargs):
+        device = next(model_fn.parameters()).device
+
+        def _fn(t, x):
+            t = torch.ones(x.size(0)).to(device) * t
+            model_output = model_fn(x, t, **model_kwargs)
+            self.pbar.update(1)
+            self.comfy_pbar.update(1)
+            return model_output
+
+        t = self.t.to(device)
+        x = model_kwargs.pop('x')
+        samples = odeint(_fn, x, t, method=self.sampler_type)
+        self.pbar.close()
+        return samples
