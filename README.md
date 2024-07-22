@@ -80,6 +80,9 @@ An Ordinary Differential Equation (ODE) solver has been integrated into the gene
 
 ![image](https://github.com/user-attachments/assets/36295516-2ced-4a17-89ac-85ae8ae313bf)
 
+![image](https://github.com/user-attachments/assets/1890f870-761e-4510-aba2-b6bcf55ea1e7)
+
+![ComfyUI_temp_ntirq_00003_](https://github.com/user-attachments/assets/c787f20b-3470-4c52-9907-f926d2729e02)
 
 
 ![image](https://github.com/user-attachments/assets/a0851ad1-10e8-4eca-9f1f-82ab94f60427)
