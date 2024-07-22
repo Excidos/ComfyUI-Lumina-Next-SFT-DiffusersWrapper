@@ -78,6 +78,7 @@ An Ordinary Differential Equation (ODE) solver has been integrated into the gene
 
 ![image](https://github.com/user-attachments/assets/94e046e3-b39b-4b3c-ae7f-723b1c8af70f)
 
+![image](https://github.com/user-attachments/assets/36295516-2ced-4a17-89ac-85ae8ae313bf)
 
 
 
