@@ -6,6 +6,7 @@ import comfy.model_management as mm
 import os
 import traceback
 import math
+from .utils import get_2d_rotary_pos_embed_lumina, ODE
 
 class LuminaDiffusersNode:
     @classmethod
@@ -26,6 +27,7 @@ class LuminaDiffusersNode:
                 "clean_caption": ("BOOLEAN", {"default": True}),
                 "max_sequence_length": ("INT", {"default": 256, "min": 64, "max": 512}),
                 "t_shift": ("INT", {"default": 4, "min": 1, "max": 20}),
+                "solver": (["euler", "midpoint", "rk4"], {"default": 'midpoint'}),
             }
         }
 
@@ -60,7 +62,7 @@ class LuminaDiffusersNode:
             traceback.print_exc()
 
     def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed,
-                 batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length, t_shift):
+                 batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length, t_shift, solver):
         try:
             if self.pipe is None:
                 print("Pipeline not loaded. Attempting to load model.")
@@ -107,10 +109,47 @@ class LuminaDiffusersNode:
                 "scaling_watershed": scaling_watershed,
             }
 
+            # Create ODE solver
+            ode = ODE(num_inference_steps, solver, t_shift)
+
+            # Modify the pipeline's __call__ method to use our custom ODE solver
+            original_call = self.pipe.__call__
+
+            def custom_call(**kwargs):
+                @torch.no_grad()
+                def model_fn(x, t, **model_kwargs):
+                    # Apply time-aware scaling
+                    scale_factor = math.sqrt(width * height / default_image_size**2)
+                    current_t = t.item()
+                    linear_factor = scale_factor if current_t < scaling_watershed else 1.0
+                    ntk_factor = 1.0 if current_t < scaling_watershed else scale_factor
+
+                    # Generate 2D rotary embeddings
+                    image_rotary_emb = get_2d_rotary_pos_embed_lumina(
+                        self.pipe.transformer.config.hidden_size // self.pipe.transformer.config.num_attention_heads,
+                        height // 8,
+                        width // 8,
+                        linear_factor=linear_factor,
+                        ntk_factor=ntk_factor
+                    )
+
+                    # Add image_rotary_emb to model_kwargs
+                    model_kwargs['image_rotary_emb'] = image_rotary_emb
+
+                    return self.pipe.transformer(x, t, **model_kwargs)
+
+                return ode.sample(model_fn, **kwargs)
+
+            self.pipe.__call__ = custom_call
+
+            # Generate images
             output = self.pipe(**pipe_args)
 
+            # Restore original __call__ method
+            self.pipe.__call__ = original_call
+
             processed_images = self.process_output(output.images)
-            latents_dict = self.process_latents(output.images)
+            latents_dict = self.process_latents(output.images, height, width)
 
             return (processed_images, latents_dict)
 
@@ -146,7 +185,7 @@ class LuminaDiffusersNode:
 
         return images
 
-    def process_latents(self, images):
+    def process_latents(self, images, height, width):
         # Prepare latents for output
         latents = images.clone().detach()  # Clone and detach to avoid modifying the original
         latents = latents.to(dtype=torch.float32)  # Ensure float32 dtype
