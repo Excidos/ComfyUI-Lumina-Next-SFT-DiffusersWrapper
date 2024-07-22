@@ -12,7 +12,7 @@ This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, e
 - Incorporates time-aware scaling for improved generation quality
 - Utilizes an ODE solver for enhanced stability and quality in the generation process
 - Automatic model downloading for seamless setup
-- Outputs both generated images and latent representations
+- Outputs generated images and working on latent representations (Latent isn't working at the moment)
 
 ## Installation
 
