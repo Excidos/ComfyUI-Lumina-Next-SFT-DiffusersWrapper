@@ -3,6 +3,11 @@ from torchdiffeq import odeint
 from comfy.utils import ProgressBar
 from tqdm import tqdm
 
+class REGIONAL_PROMPT:
+    def __init__(self, prompt, mask):
+        self.prompt = prompt
+        self.mask = mask
+
 def get_2d_rotary_pos_embed_lumina(head_dim, height, width, linear_factor=1.0, ntk_factor=1.0):
     x = torch.arange(width).float() * linear_factor
     y = torch.arange(height).float() * linear_factor
