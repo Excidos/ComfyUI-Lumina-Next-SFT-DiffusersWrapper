@@ -10,7 +10,6 @@ def get_2d_rotary_pos_embed_lumina(head_dim, height, width, linear_factor=1.0, n
     pos = torch.stack([x, y], dim=-1)
     pos = pos.view(-1, 2)
 
-    # Adjust the dimension to match head_dim
     dim = head_dim // 2
     inv_freq = 1.0 / (10000 ** (torch.arange(0, dim, 2).float() / dim))
     sinusoid_inp = torch.einsum("i,j->ij", pos.view(-1), inv_freq)
