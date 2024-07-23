@@ -2,7 +2,7 @@
 
 ## Lumina Diffusers Node for ComfyUI
 
-This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, enabling high-quality image generation using the advanced Lumina text-to-image pipeline. While still under active development, it offers a robust and functional implementation.
+This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, enabling high-quality image generation using the advanced Lumina text-to-image pipeline. While still under active development, it offers a robust and functional implementation with advanced features inspired by ImpactPack.
 
 ## Features
 
@@ -11,8 +11,9 @@ This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, e
 - Implements Lumina-specific features including scaling watershed and proportional attention
 - Incorporates time-aware scaling for improved generation quality
 - Utilizes an ODE solver for enhanced stability and quality in the generation process
+- Supports regional prompting with masks for fine-grained control over different image areas
 - Automatic model downloading for seamless setup
-- Outputs generated images and working on latent representations (Latent isn't working at the moment)
+- Outputs generated images and latent representations
 
 ## Installation
 
@@ -49,12 +50,19 @@ or for manual installation.
 - `height`: Output image height (default: 1024)
 - `seed`: Random seed for generation (-1 for random)
 - `batch_size`: Number of images to generate in one batch (default: 1)
-- `scaling_watershed`: Scaling watershed parameter (default: 1.0)
+- `scaling_watershed`: Scaling watershed parameter (default: 0.3)
 - `proportional_attn`: Enable proportional attention (default: True)
 - `clean_caption`: Clean input captions (default: True)
 - `max_sequence_length`: Maximum sequence length for text input (default: 256)
 - `t_shift`: Time shift parameter for scheduler (default: 4)
 - `solver`: ODE solver type (options: "euler", "midpoint", "rk4", default: "midpoint")
+- `use_ode_sampling`: Enable ODE sampling (default: False)
+- `strength`: Strength parameter for ODE sampling (default: 1.0, range: 0.0 to 1.0)
+
+## Optional Inputs
+
+- `regional_prompts`: Regional prompts for fine-grained control
+- `mask`: Mask for regional prompting
 
 ## Outputs
 
@@ -70,6 +78,11 @@ The node now implements time-aware scaling, which adjusts the generation process
 ### ODE Solver
 
 An Ordinary Differential Equation (ODE) solver has been integrated into the generation process. This advanced technique enhances the stability and quality of the generated images, particularly for complex prompts or high-resolution outputs.
+
+### Regional Prompting
+
+Inspired by ImpactPack, this node now supports regional prompting. Users can provide different prompts for specific areas of the image using masks, allowing for more precise control over the generated content.
+
 ## Example Outputs
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
@@ -94,7 +107,6 @@ An Ordinary Differential Equation (ODE) solver has been integrated into the gene
 
 ![ComfyUI_temp_kbsgn_00011_](https://github.com/user-attachments/assets/6f31783c-2a26-424c-a959-10dada7d3be1)
 
-
 ## Troubleshooting
 
 If you encounter any issues, please check the console output for error messages. Common issues include:
@@ -109,8 +121,8 @@ For further assistance, please open an issue on the GitHub repository.
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
-
 ## Acknowledgements
 
-- [Lumina-Next-SFT-Diffusers]([https://www.luminai.com/](https://huggingface.co/Alpha-VLLM/Lumina-Next-SFT-diffusers)) for the Lumina-Next-SFT model
+- [Lumina-Next-SFT-Diffusers](https://huggingface.co/Alpha-VLLM/Lumina-Next-SFT-diffusers) for the Lumina-Next-SFT model
 - The ComfyUI community for their continuous support and inspiration
+- ImpactPack for inspiration on advanced features like regional prompting
