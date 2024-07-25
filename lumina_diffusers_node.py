@@ -6,7 +6,8 @@ import comfy.model_management as mm
 import os
 import traceback
 import math
-from .utils import get_2d_rotary_pos_embed_lumina, ODE
+from .utils import get_2d_rotary_pos_embed_lumina, REGIONAL_PROMPT
+import inspect
 
 class LuminaDiffusersNode:
     @classmethod
@@ -26,14 +27,11 @@ class LuminaDiffusersNode:
                 "proportional_attn": ("BOOLEAN", {"default": True}),
                 "clean_caption": ("BOOLEAN", {"default": True}),
                 "max_sequence_length": ("INT", {"default": 256, "min": 64, "max": 512}),
-                "t_shift": ("INT", {"default": 4, "min": 1, "max": 20}),
-                "solver": (["euler", "midpoint", "rk4"], {"default": 'midpoint'}),
-                "use_ode_sampling": ("BOOLEAN", {"default": False}),
-                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             },
             "optional": {
                 "regional_prompts": ("REGIONAL_PROMPTS",),
                 "mask": ("MASK",),
+                "latents": ("LATENT",),
             }
         }
 
@@ -68,8 +66,7 @@ class LuminaDiffusersNode:
             traceback.print_exc()
 
     def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed,
-                 batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length, t_shift, solver, 
-                 use_ode_sampling, strength, regional_prompts=None, mask=None):
+                batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length):
         try:
             if self.pipe is None:
                 self.load_model(model_path)
@@ -86,16 +83,7 @@ class LuminaDiffusersNode:
             else:
                 self.pipe.cross_attention_kwargs = None
 
-            time_shift_factor = 1 + t_shift
-            self.pipe.scheduler.config.shift = time_shift_factor
-
             print(f"Starting generation with seed: {seed}")
-
-            # Handle regional prompts
-            if regional_prompts:
-                prompt_embeds, negative_prompt_embeds = self.process_regional_prompts(regional_prompts, mask, width, height)
-            else:
-                prompt_embeds, negative_prompt_embeds = None, None
 
             pipe_args = {
                 "prompt": prompt,
@@ -109,43 +97,11 @@ class LuminaDiffusersNode:
                 "output_type": "pt",
                 "clean_caption": clean_caption,
                 "max_sequence_length": max_sequence_length,
-                "prompt_embeds": prompt_embeds,
-                "negative_prompt_embeds": negative_prompt_embeds,
+                "scaling_watershed": scaling_watershed,
             }
-
-            if use_ode_sampling:
-                ode = ODE(num_inference_steps, solver, t_shift, strength)
-                original_call = self.pipe.__call__
-
-                def custom_call(**kwargs):
-                    @torch.no_grad()
-                    def model_fn(x, t, **model_kwargs):
-                        scale_factor = math.sqrt(width * height / default_image_size**2)
-                        current_t = t.item()
-                        linear_factor = scale_factor if current_t < scaling_watershed else 1.0
-                        ntk_factor = 1.0 if current_t < scaling_watershed else scale_factor
-
-                        image_rotary_emb = get_2d_rotary_pos_embed_lumina(
-                            self.pipe.transformer.config.hidden_size // self.pipe.transformer.config.num_attention_heads,
-                            height // 8,
-                            width // 8,
-                            linear_factor=linear_factor,
-                            ntk_factor=ntk_factor
-                        )
-
-                        model_kwargs['image_rotary_emb'] = image_rotary_emb
-                        return self.pipe.transformer(x, t, **model_kwargs)
-
-                    return ode.sample(model_fn, **kwargs)
-
-                self.pipe.__call__ = custom_call
 
             # Generate images
             output = self.pipe(**pipe_args)
-
-            if use_ode_sampling:
-                # Restore original __call__ method
-                self.pipe.__call__ = original_call
 
             processed_images = self.process_output(output.images)
             latents_dict = self.process_latents(output.images)
@@ -157,35 +113,6 @@ class LuminaDiffusersNode:
             traceback.print_exc()
             return (torch.zeros((batch_size, height, width, 3), dtype=torch.float32),
                     {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
-
-    def process_regional_prompts(self, regional_prompts, mask, width, height):
-        device = mm.get_torch_device()
-        
-        if mask is None:
-            mask = torch.ones((height, width), device=device)
-        else:
-            mask = mask.to(device)
-
-        combined_embeds = []
-        combined_negative_embeds = []
-
-        for region in regional_prompts:
-            region_mask = region.mask * mask
-            region_embeds = self.pipe.encode_prompt(
-                prompt=region.prompt,
-                device=device,
-                num_images_per_prompt=1,
-                do_classifier_free_guidance=True,
-                negative_prompt=""
-            )
-            
-            combined_embeds.append(region_embeds[0] * region_mask)
-            combined_negative_embeds.append(region_embeds[1] * region_mask)
-
-        prompt_embeds = torch.sum(torch.stack(combined_embeds), dim=0)
-        negative_prompt_embeds = torch.sum(torch.stack(combined_negative_embeds), dim=0)
-
-        return prompt_embeds, negative_prompt_embeds
 
     def process_output(self, images):
         print(f"Raw output images shape: {images.shape}")
