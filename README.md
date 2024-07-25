@@ -9,9 +9,6 @@ This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, e
 - Harnesses the power of the Lumina-Next-SFT model for state-of-the-art image generation
 - Offers a wide range of generation parameters for fine-tuned control
 - Implements Lumina-specific features including scaling watershed and proportional attention
-- Incorporates time-aware scaling for improved generation quality
-- Utilizes an ODE solver for enhanced stability and quality in the generation process
-- Supports regional prompting with masks for fine-grained control over different image areas
 - Automatic model downloading for seamless setup
 - Outputs generated images and latent representations
 
@@ -54,34 +51,16 @@ or for manual installation.
 - `proportional_attn`: Enable proportional attention (default: True)
 - `clean_caption`: Clean input captions (default: True)
 - `max_sequence_length`: Maximum sequence length for text input (default: 256)
-- `t_shift`: Time shift parameter for scheduler (default: 4)
-- `solver`: ODE solver type (options: "euler", "midpoint", "rk4", default: "midpoint")
-- `use_ode_sampling`: Enable ODE sampling (default: False)
-- `strength`: Strength parameter for ODE sampling (default: 1.0, range: 0.0 to 1.0)
-
-## Optional Inputs
-
-- `regional_prompts`: Regional prompts for fine-grained control
-- `mask`: Mask for regional prompting
 
 ## Outputs
 
 1. `IMAGE`: Generated image(s) in tensor format
 2. `LATENT`: Latent representation of the generated image(s)
 
-## Advanced Features
+## Known Limitations
 
-### Time-Aware Scaling
-
-The node now implements time-aware scaling, which adjusts the generation process based on the current timestep. This results in improved image quality, especially for high-resolution outputs.
-
-### ODE Solver
-
-An Ordinary Differential Equation (ODE) solver has been integrated into the generation process. This advanced technique enhances the stability and quality of the generated images, particularly for complex prompts or high-resolution outputs.
-
-### Regional Prompting
-
-Inspired by ImpactPack, this node now supports regional prompting. Users can provide different prompts for specific areas of the image using masks, allowing for more precise control over the generated content.
+- Currently, passing or decoding latents is not functioning correctly. We are actively working on resolving this issue.
+- Some advanced features have been temporarily removed to align more closely with the official diffusers implementation. We are exploring ways to reintegrate these features in a compatible manner.
 
 ## Example Outputs
 
