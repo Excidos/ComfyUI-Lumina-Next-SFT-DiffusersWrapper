@@ -6,8 +6,7 @@ import comfy.model_management as mm
 import os
 import traceback
 import math
-from .utils import get_2d_rotary_pos_embed_lumina, REGIONAL_PROMPT
-import inspect
+from .utils import get_2d_rotary_pos_embed_lumina
 
 class LuminaDiffusersNode:
     @classmethod
@@ -27,10 +26,10 @@ class LuminaDiffusersNode:
                 "proportional_attn": ("BOOLEAN", {"default": True}),
                 "clean_caption": ("BOOLEAN", {"default": True}),
                 "max_sequence_length": ("INT", {"default": 256, "min": 64, "max": 512}),
+                "use_time_shift": ("BOOLEAN", {"default": False}),
+                "t_shift": ("INT", {"default": 4, "min": 1, "max": 20}),
             },
             "optional": {
-                "regional_prompts": ("REGIONAL_PROMPTS",),
-                "mask": ("MASK",),
                 "latents": ("LATENT",),
             }
         }
@@ -66,7 +65,8 @@ class LuminaDiffusersNode:
             traceback.print_exc()
 
     def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed,
-                batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length):
+                 batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length, 
+                 use_time_shift, t_shift, latents=None):
         try:
             if self.pipe is None:
                 self.load_model(model_path)
@@ -82,6 +82,14 @@ class LuminaDiffusersNode:
                 self.pipe.cross_attention_kwargs = {"base_sequence_length": (default_image_size // 16) ** 2}
             else:
                 self.pipe.cross_attention_kwargs = None
+
+            # Apply time shift if enabled
+            if use_time_shift:
+                time_shift_factor = 1 + t_shift
+                self.pipe.scheduler.config.shift = time_shift_factor
+                print(f"Time shift factor: {time_shift_factor}")
+            else:
+                print("Time shift disabled")
 
             print(f"Starting generation with seed: {seed}")
 
@@ -99,6 +107,20 @@ class LuminaDiffusersNode:
                 "max_sequence_length": max_sequence_length,
                 "scaling_watershed": scaling_watershed,
             }
+
+            if latents is not None:
+                print("Input latents provided:")
+                print(f"Latents shape: {latents['samples'].shape}")
+                print(f"Latents dtype: {latents['samples'].dtype}")
+                print(f"Latents min: {latents['samples'].min()}, max: {latents['samples'].max()}")
+                
+                # Ensure latents are in the correct shape and on the right device
+                expected_shape = (batch_size, 4, height // 8, width // 8)
+                if latents['samples'].shape != expected_shape:
+                    print(f"Warning: Latents shape mismatch. Expected {expected_shape}, got {latents['samples'].shape}")
+                    latents['samples'] = torch.randn(expected_shape, device=device, dtype=self.pipe.transformer.dtype)
+                
+                pipe_args["latents"] = latents['samples'].to(device=device, dtype=self.pipe.transformer.dtype)
 
             # Generate images
             output = self.pipe(**pipe_args)
@@ -136,6 +158,15 @@ class LuminaDiffusersNode:
         print(f"Latents shape before processing: {latents.shape}")
         print(f"Latents dtype: {latents.dtype}")
         print(f"Latents min: {latents.min()}, max: {latents.max()}")
+
+        # Ensure 4 channels
+        if latents.shape[1] == 3:
+            print("Adding fourth channel to latents")
+            latents = torch.cat([latents, torch.zeros_like(latents[:, :1])], dim=1)
+        
+        print(f"Final latents shape: {latents.shape}")
+        print(f"Final latents dtype: {latents.dtype}")
+        print(f"Final latents min: {latents.min()}, max: {latents.max()}")
 
         return {"samples": latents}
 
