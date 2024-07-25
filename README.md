@@ -78,6 +78,11 @@ or for manual installation.
 
 ![image](https://github.com/user-attachments/assets/1890f870-761e-4510-aba2-b6bcf55ea1e7)
 
+![ComfyUI_temp_mhdzy_00001_](https://github.com/user-attachments/assets/c4063f47-a8eb-4c3f-b4b0-fab6490a3d6f)
+
+![ComfyUI_temp_mhdzy_00004_](https://github.com/user-attachments/assets/a5f2f074-f537-42a6-acb3-7fb69040c69f)
+
+
 ![ComfyUI_temp_ntirq_00004_](https://github.com/user-attachments/assets/1bcacf31-208a-4983-8bc3-e2480b226ccc)
 
 ![ComfyUI_temp_ntirq_00003_](https://github.com/user-attachments/assets/c787f20b-3470-4c52-9907-f926d2729e02)
