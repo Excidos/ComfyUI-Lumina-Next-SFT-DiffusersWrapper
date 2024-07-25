@@ -13,7 +13,7 @@ class LuminaDiffusersNode:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "model_path": ("STRING", {"default": "Lumina-Next-SFT-diffusers"}),
+                "model_path": ("STRING", {"default": "Alpha-VLLM/Lumina-Next-SFT-diffusers"}),
                 "prompt": ("STRING", {"multiline": True}),
                 "negative_prompt": ("STRING", {"multiline": True}),
                 "num_inference_steps": ("INT", {"default": 30, "min": 1, "max": 200}),
@@ -76,14 +76,15 @@ class LuminaDiffusersNode:
                 seed = int.from_bytes(os.urandom(4), "big")
             generator = torch.Generator(device=device).manual_seed(seed)
 
-            default_image_size = self.pipe.transformer.config.sample_size * self.pipe.vae_scale_factor
+            vae_scale_factor = 1 / self.pipe.vae.config.scaling_factor
+            latent_height = int(height / vae_scale_factor)
+            latent_width = int(width / vae_scale_factor)
 
             if proportional_attn:
-                self.pipe.cross_attention_kwargs = {"base_sequence_length": (default_image_size // 16) ** 2}
+                self.pipe.cross_attention_kwargs = {"base_sequence_length": (latent_height * latent_width)}
             else:
                 self.pipe.cross_attention_kwargs = None
 
-            # Apply time shift if enabled
             if use_time_shift:
                 time_shift_factor = 1 + t_shift
                 self.pipe.scheduler.config.shift = time_shift_factor
@@ -102,7 +103,7 @@ class LuminaDiffusersNode:
                 "guidance_scale": guidance_scale,
                 "num_images_per_prompt": batch_size,
                 "generator": generator,
-                "output_type": "pt",
+                "output_type": "latent",
                 "clean_caption": clean_caption,
                 "max_sequence_length": max_sequence_length,
                 "scaling_watershed": scaling_watershed,
@@ -114,19 +115,26 @@ class LuminaDiffusersNode:
                 print(f"Latents dtype: {latents['samples'].dtype}")
                 print(f"Latents min: {latents['samples'].min()}, max: {latents['samples'].max()}")
                 
-                # Ensure latents are in the correct shape and on the right device
-                expected_shape = (batch_size, 4, height // 8, width // 8)
+                expected_shape = (batch_size, 4, latent_height, latent_width)
                 if latents['samples'].shape != expected_shape:
                     print(f"Warning: Latents shape mismatch. Expected {expected_shape}, got {latents['samples'].shape}")
-                    latents['samples'] = torch.randn(expected_shape, device=device, dtype=self.pipe.transformer.dtype)
-                
-                pipe_args["latents"] = latents['samples'].to(device=device, dtype=self.pipe.transformer.dtype)
+                    print("Resizing input latents to match expected shape.")
+                    resized_latents = torch.nn.functional.interpolate(latents['samples'], size=(latent_height, latent_width), mode='bilinear', align_corners=False)
+                    pipe_args["latents"] = resized_latents.to(device=device, dtype=self.pipe.transformer.dtype)
+                else:
+                    pipe_args["latents"] = latents['samples'].to(device=device, dtype=self.pipe.transformer.dtype)
 
-            # Generate images
+                # Normalize latents
+                pipe_args["latents"] = (pipe_args["latents"] - pipe_args["latents"].mean()) / pipe_args["latents"].std()
+
+            # Generate latents
             output = self.pipe(**pipe_args)
 
-            processed_images = self.process_output(output.images)
-            latents_dict = self.process_latents(output.images)
+            # Decode latents
+            images = self.decode_latents(output.images)
+
+            processed_images = self.process_output(images)
+            latents_dict = {"samples": output.images}
 
             return (processed_images, latents_dict)
 
@@ -134,15 +142,16 @@ class LuminaDiffusersNode:
             print(f"Error in generate: {str(e)}")
             traceback.print_exc()
             return (torch.zeros((batch_size, height, width, 3), dtype=torch.float32),
-                    {"samples": torch.zeros((batch_size, 4, height // 8, width // 8), dtype=torch.float32)})
+                    {"samples": torch.zeros((batch_size, 4, latent_height, latent_width), dtype=torch.float32)})
+
+    def decode_latents(self, latents):
+        latents = latents / self.pipe.vae.config.scaling_factor
+        image = self.pipe.vae.decode(latents.to(dtype=self.pipe.vae.dtype), return_dict=False)[0]
+        image = (image / 2 + 0.5).clamp(0, 1)
+        return image.cpu().float().numpy()
 
     def process_output(self, images):
-        print(f"Raw output images shape: {images.shape}")
-        print(f"Raw output images dtype: {images.dtype}")
-        print(f"Raw output images min: {images.min()}, max: {images.max()}")
-
-        images = images.float()
-        images = images.clamp(0, 1)
+        images = torch.from_numpy(images)
         images = images.permute(0, 2, 3, 1)
 
         print(f"Processed images shape: {images.shape}")
@@ -150,25 +159,6 @@ class LuminaDiffusersNode:
         print(f"Processed images min: {images.min()}, max: {images.max()}")
 
         return images
-
-    def process_latents(self, images):
-        latents = images.clone().detach()
-        latents = latents.to(dtype=torch.float32)
-        
-        print(f"Latents shape before processing: {latents.shape}")
-        print(f"Latents dtype: {latents.dtype}")
-        print(f"Latents min: {latents.min()}, max: {latents.max()}")
-
-        # Ensure 4 channels
-        if latents.shape[1] == 3:
-            print("Adding fourth channel to latents")
-            latents = torch.cat([latents, torch.zeros_like(latents[:, :1])], dim=1)
-        
-        print(f"Final latents shape: {latents.shape}")
-        print(f"Final latents dtype: {latents.dtype}")
-        print(f"Final latents min: {latents.min()}, max: {latents.max()}")
-
-        return {"samples": latents}
 
 NODE_CLASS_MAPPINGS = {
     "LuminaDiffusersNode": LuminaDiffusersNode
