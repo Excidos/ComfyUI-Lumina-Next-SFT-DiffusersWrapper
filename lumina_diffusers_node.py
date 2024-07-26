@@ -25,7 +25,7 @@ class LuminaDiffusersNode:
                 "scaling_watershed": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1.0}),
                 "proportional_attn": ("BOOLEAN", {"default": True}),
                 "clean_caption": ("BOOLEAN", {"default": True}),
-                "max_sequence_length": ("INT", {"default": 256, "min": 64, "max": 512}),
+                "max_sequence_length": ("INT", {"default": 512, "min": 64, "max": 512}),
                 "use_time_shift": ("BOOLEAN", {"default": False}),
                 "t_shift": ("INT", {"default": 4, "min": 1, "max": 20}),
             },
@@ -76,9 +76,9 @@ class LuminaDiffusersNode:
                 seed = int.from_bytes(os.urandom(4), "big")
             generator = torch.Generator(device=device).manual_seed(seed)
 
-            vae_scale_factor = 1 / self.pipe.vae.config.scaling_factor
-            latent_height = int(height / vae_scale_factor)
-            latent_width = int(width / vae_scale_factor)
+            vae_scale_factor = self.pipe.vae_scale_factor
+            latent_height = height // vae_scale_factor
+            latent_width = width // vae_scale_factor
 
             if proportional_attn:
                 self.pipe.cross_attention_kwargs = {"base_sequence_length": (latent_height * latent_width)}
@@ -126,6 +126,9 @@ class LuminaDiffusersNode:
 
                 # Normalize latents
                 pipe_args["latents"] = (pipe_args["latents"] - pipe_args["latents"].mean()) / pipe_args["latents"].std()
+            else:
+                # Generate random latents if not provided
+                pipe_args["latents"] = torch.randn((batch_size, 4, latent_height, latent_width), generator=generator, device=device, dtype=self.pipe.transformer.dtype)
 
             # Generate latents
             output = self.pipe(**pipe_args)
@@ -145,10 +148,11 @@ class LuminaDiffusersNode:
                     {"samples": torch.zeros((batch_size, 4, latent_height, latent_width), dtype=torch.float32)})
 
     def decode_latents(self, latents):
-        latents = latents / self.pipe.vae.config.scaling_factor
-        image = self.pipe.vae.decode(latents.to(dtype=self.pipe.vae.dtype), return_dict=False)[0]
+        latents = 1 / self.pipe.vae.config.scaling_factor * latents
+        image = self.pipe.vae.decode(latents.to(dtype=self.pipe.vae.dtype)).sample
         image = (image / 2 + 0.5).clamp(0, 1)
         return image.cpu().float().numpy()
+
 
     def process_output(self, images):
         images = torch.from_numpy(images)
