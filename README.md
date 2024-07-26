@@ -50,8 +50,8 @@ or for manual installation.
 - `scaling_watershed`: Scaling watershed parameter (default: 0.3)
 - `proportional_attn`: Enable proportional attention (default: True)
 - `clean_caption`: Clean input captions (default: True)
-- `max_sequence_length`: Maximum sequence length for text input (default: 256)
-
+- `max_sequence_length`: Maximum sequence length for text input (default: 512)
+- 
 ## Outputs
 
 1. `IMAGE`: Generated image(s) in tensor format
@@ -63,6 +63,9 @@ or for manual installation.
 - Some advanced features have been temporarily removed to align more closely with the official diffusers implementation. We are exploring ways to reintegrate these features in a compatible manner.
 
 ## Example Outputs
+
+![ComfyUI_temp_qqfjt_00016_(1)](https://github.com/user-attachments/assets/28c81930-55e7-41c1-97ee-392a0dfd1022)
+
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
 
