@@ -2,21 +2,22 @@
 
 ## Lumina Diffusers Node for ComfyUI
 
-This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, enabling high-quality image generation using the advanced Lumina text-to-image pipeline. While still under active development, it offers a robust and functional implementation with advanced features inspired by ImpactPack.
+This custom node seamlessly integrates the Lumina-Next-SFT model into ComfyUI, enabling high-quality image generation using the advanced Lumina text-to-image pipeline. While still under active development, it offers a robust and functional implementation with advanced features.
 
 ## Features
 
 - Harnesses the power of the Lumina-Next-SFT model for state-of-the-art image generation
 - Offers a wide range of generation parameters for fine-tuned control
 - Implements Lumina-specific features including scaling watershed and proportional attention
+- Supports input latents and strength parameter for image-to-image capabilities
 - Automatic model downloading for seamless setup
-- Outputs generated images and latent representations
+- Outputs generated latent representations
 
 ## Installation
 
-## Now in ComfyUI Manager!
+### Now in ComfyUI Manager!
 
-or for manual installation.
+For manual installation:
 
 1. Ensure you have ComfyUI installed and properly set up.
 2. Clone this repository into your ComfyUI custom nodes directory:
@@ -38,34 +39,39 @@ or for manual installation.
 
 ## Parameters
 
-- `model_path`: Path to the Lumina model (default: "Lumina-Next-SFT-diffusers")
+- `model_path`: Path to the Lumina model (default: "Alpha-VLLM/Lumina-Next-SFT-diffusers")
 - `prompt`: Text prompt for image generation
 - `negative_prompt`: Negative text prompt
 - `num_inference_steps`: Number of denoising steps (default: 30)
 - `guidance_scale`: Classifier-free guidance scale (default: 4.0)
-- `width`: Output image width (default: 1024)
-- `height`: Output image height (default: 1024)
 - `seed`: Random seed for generation (-1 for random)
 - `batch_size`: Number of images to generate in one batch (default: 1)
 - `scaling_watershed`: Scaling watershed parameter (default: 0.3)
 - `proportional_attn`: Enable proportional attention (default: True)
 - `clean_caption`: Clean input captions (default: True)
-- `max_sequence_length`: Maximum sequence length for text input (default: 512)
-- 
+- `max_sequence_length`: Maximum sequence length for text input (default: 256)
+- `use_time_shift`: Enable time shift feature (default: False)
+- `t_shift`: Time shift factor (default: 4)
+- `strength`: Strength for image-to-image generation (default: 1.0, range: 0.0 to 1.0)
+
+## Inputs
+
+- `latents` (optional): Input latents for image-to-image generation
+
 ## Outputs
 
-1. `IMAGE`: Generated image(s) in tensor format
-2. `LATENT`: Latent representation of the generated image(s)
+- `LATENT`: Latent representation of the generated image(s)
 
-## Known Limitations
+## Known Features and Limitations
 
-- Currently, passing or decoding latents is not functioning correctly. We are actively working on resolving this issue.
-- Some advanced features have been temporarily removed to align more closely with the official diffusers implementation. We are exploring ways to reintegrate these features in a compatible manner.
+- Supports input latents for image-to-image generation
+- Implements strength parameter for controlling the influence of input latents
+- Time shift feature for advanced control over the generation process
+- Output is currently limited to latent representations; use a VAE decode node to obtain images
 
 ## Example Outputs
 
 ![ComfyUI_temp_qqfjt_00016_(1)](https://github.com/user-attachments/assets/28c81930-55e7-41c1-97ee-392a0dfd1022)
-
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
 
@@ -84,7 +90,6 @@ or for manual installation.
 ![ComfyUI_temp_mhdzy_00001_](https://github.com/user-attachments/assets/c4063f47-a8eb-4c3f-b4b0-fab6490a3d6f)
 
 ![ComfyUI_temp_mhdzy_00004_](https://github.com/user-attachments/assets/a5f2f074-f537-42a6-acb3-7fb69040c69f)
-
 
 ![ComfyUI_temp_ntirq_00004_](https://github.com/user-attachments/assets/1bcacf31-208a-4983-8bc3-e2480b226ccc)
 
@@ -112,4 +117,3 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 - [Lumina-Next-SFT-Diffusers](https://huggingface.co/Alpha-VLLM/Lumina-Next-SFT-diffusers) for the Lumina-Next-SFT model
 - The ComfyUI community for their continuous support and inspiration
-- ImpactPack for inspiration on advanced features like regional prompting
