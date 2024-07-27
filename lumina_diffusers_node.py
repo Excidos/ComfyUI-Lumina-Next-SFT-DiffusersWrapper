@@ -1,12 +1,9 @@
 import torch
 import numpy as np
 from diffusers import LuminaText2ImgPipeline, FlowMatchEulerDiscreteScheduler
-from transformers import AutoModel, AutoTokenizer
 import comfy.model_management as mm
 import os
 import traceback
-import math
-from .utils import get_2d_rotary_pos_embed_lumina
 
 class LuminaDiffusersNode:
     @classmethod
@@ -18,28 +15,28 @@ class LuminaDiffusersNode:
                 "negative_prompt": ("STRING", {"multiline": True}),
                 "num_inference_steps": ("INT", {"default": 30, "min": 1, "max": 200}),
                 "guidance_scale": ("FLOAT", {"default": 4.0, "min": 0.1, "max": 20.0}),
-                "width": ("INT", {"default": 1024, "min": 512, "max": 2048, "step": 64}),
-                "height": ("INT", {"default": 1024, "min": 512, "max": 2048, "step": 64}),
                 "seed": ("INT", {"default": -1}),
                 "batch_size": ("INT", {"default": 1, "min": 1, "max": 4}),
                 "scaling_watershed": ("FLOAT", {"default": 0.3, "min": 0.0, "max": 1.0}),
                 "proportional_attn": ("BOOLEAN", {"default": True}),
                 "clean_caption": ("BOOLEAN", {"default": True}),
-                "max_sequence_length": ("INT", {"default": 512, "min": 64, "max": 512}),
+                "max_sequence_length": ("INT", {"default": 256, "min": 64, "max": 512}),
                 "use_time_shift": ("BOOLEAN", {"default": False}),
                 "t_shift": ("INT", {"default": 4, "min": 1, "max": 20}),
+                "strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 1.0, "step": 0.01}),
             },
             "optional": {
                 "latents": ("LATENT",),
             }
         }
 
-    RETURN_TYPES = ("IMAGE", "LATENT")
+    RETURN_TYPES = ("LATENT",)
     FUNCTION = "generate"
     CATEGORY = "LuminaWrapper"
 
     def __init__(self):
         self.pipe = None
+        self.vae_scale_factor = 0.13025  # SDXL scaling factor
 
     def load_model(self, model_path):
         try:
@@ -64,9 +61,9 @@ class LuminaDiffusersNode:
             print(f"Error in load_model: {str(e)}")
             traceback.print_exc()
 
-    def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, width, height, seed,
+    def generate(self, model_path, prompt, negative_prompt, num_inference_steps, guidance_scale, seed,
                  batch_size, scaling_watershed, proportional_attn, clean_caption, max_sequence_length, 
-                 use_time_shift, t_shift, latents=None):
+                 use_time_shift, t_shift, strength, latents=None):
         try:
             if self.pipe is None:
                 self.load_model(model_path)
@@ -76,12 +73,15 @@ class LuminaDiffusersNode:
                 seed = int.from_bytes(os.urandom(4), "big")
             generator = torch.Generator(device=device).manual_seed(seed)
 
-            vae_scale_factor = self.pipe.vae_scale_factor
-            latent_height = height // vae_scale_factor
-            latent_width = width // vae_scale_factor
+            if latents is not None:
+                latent_height, latent_width = latents['samples'].shape[2:]
+                height, width = latent_height * 8, latent_width * 8
+            else:
+                height = width = 1024
+                latent_height, latent_width = height // 8, width // 8
 
             if proportional_attn:
-                self.pipe.cross_attention_kwargs = {"base_sequence_length": (latent_height * latent_width)}
+                self.pipe.cross_attention_kwargs = {"base_sequence_length": (height * width) // 256}
             else:
                 self.pipe.cross_attention_kwargs = None
 
@@ -115,54 +115,44 @@ class LuminaDiffusersNode:
                 print(f"Latents dtype: {latents['samples'].dtype}")
                 print(f"Latents min: {latents['samples'].min()}, max: {latents['samples'].max()}")
                 
-                expected_shape = (batch_size, 4, latent_height, latent_width)
-                if latents['samples'].shape != expected_shape:
-                    print(f"Warning: Latents shape mismatch. Expected {expected_shape}, got {latents['samples'].shape}")
-                    print("Resizing input latents to match expected shape.")
-                    resized_latents = torch.nn.functional.interpolate(latents['samples'], size=(latent_height, latent_width), mode='bilinear', align_corners=False)
-                    pipe_args["latents"] = resized_latents.to(device=device, dtype=self.pipe.transformer.dtype)
-                else:
-                    pipe_args["latents"] = latents['samples'].to(device=device, dtype=self.pipe.transformer.dtype)
+                # Scale input latents
+                scaled_latents = latents['samples'] * self.vae_scale_factor
+                pipe_args["latents"] = scaled_latents.to(device=device, dtype=self.pipe.transformer.dtype)
 
-                # Normalize latents
-                pipe_args["latents"] = (pipe_args["latents"] - pipe_args["latents"].mean()) / pipe_args["latents"].std()
-            else:
-                # Generate random latents if not provided
-                pipe_args["latents"] = torch.randn((batch_size, 4, latent_height, latent_width), generator=generator, device=device, dtype=self.pipe.transformer.dtype)
+                # Apply strength
+                if strength < 1.0:
+                    noise = torch.randn_like(pipe_args["latents"])
+                    pipe_args["latents"] = self.pipe.scheduler.scale_noise(pipe_args["latents"], num_inference_steps, noise)
+                    pipe_args["latents"] = strength * pipe_args["latents"] + (1 - strength) * noise
+
+                # Check if latents are all zeros and add noise if necessary
+                if pipe_args["latents"].min() == pipe_args["latents"].max() == 0:
+                    print("Warning: Input latents are all zeros. Adding noise.")
+                    noise = torch.randn_like(pipe_args["latents"])
+                    pipe_args["latents"] = noise * 0.99 + pipe_args["latents"] * 0.01
 
             # Generate latents
             output = self.pipe(**pipe_args)
 
-            # Decode latents
-            images = self.decode_latents(output.images)
+            # Process output latents
+            latents = output.images
 
-            processed_images = self.process_output(images)
-            latents_dict = {"samples": output.images}
+            # Ensure no NaN values in the output
+            latents = torch.nan_to_num(latents, nan=0.0, posinf=1.0, neginf=-1.0)
 
-            return (processed_images, latents_dict)
+            # Scale output latents
+            latents = latents / self.vae_scale_factor
+
+            print(f"Generated latents shape: {latents.shape}")
+            print(f"Generated latents dtype: {latents.dtype}")
+            print(f"Generated latents min: {latents.min()}, max: {latents.max()}")
+
+            return ({"samples": latents.to(device)},)
 
         except Exception as e:
             print(f"Error in generate: {str(e)}")
             traceback.print_exc()
-            return (torch.zeros((batch_size, height, width, 3), dtype=torch.float32),
-                    {"samples": torch.zeros((batch_size, 4, latent_height, latent_width), dtype=torch.float32)})
-
-    def decode_latents(self, latents):
-        latents = 1 / self.pipe.vae.config.scaling_factor * latents
-        image = self.pipe.vae.decode(latents.to(dtype=self.pipe.vae.dtype)).sample
-        image = (image / 2 + 0.5).clamp(0, 1)
-        return image.cpu().float().numpy()
-
-
-    def process_output(self, images):
-        images = torch.from_numpy(images)
-        images = images.permute(0, 2, 3, 1)
-
-        print(f"Processed images shape: {images.shape}")
-        print(f"Processed images dtype: {images.dtype}")
-        print(f"Processed images min: {images.min()}, max: {images.max()}")
-
-        return images
+            return ({"samples": torch.zeros((batch_size, 4, latent_height, latent_width), dtype=torch.float32, device=device)},)
 
 NODE_CLASS_MAPPINGS = {
     "LuminaDiffusersNode": LuminaDiffusersNode
