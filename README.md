@@ -71,6 +71,9 @@ For manual installation:
 
 ## Example Outputs
 
+![Screenshot 2024-07-28 195044](https://github.com/user-attachments/assets/af81242f-9386-4767-9600-d70f7eb1468f)
+
+
 ![ComfyUI_temp_qqfjt_00016_(1)](https://github.com/user-attachments/assets/28c81930-55e7-41c1-97ee-392a0dfd1022)
 
 ![Screenshot 2024-07-22 103940](https://github.com/user-attachments/assets/5678611c-c468-40df-b6d9-b44c64ac2fd9)
