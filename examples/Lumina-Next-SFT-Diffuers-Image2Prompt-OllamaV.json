@@ -1,0 +1,449 @@
+{
+  "last_node_id": 189,
+  "last_link_id": 286,
+  "nodes": [
+    {
+      "id": 188,
+      "type": "OllamaVision",
+      "pos": [
+        615,
+        1937
+      ],
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 283
+        }
+      ],
+      "outputs": [
+        {
+          "name": "description",
+          "type": "STRING",
+          "links": [
+            284,
+            286
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "OllamaVision"
+      },
+      "widgets_values": [
+        "Describe the image in detail, focusing on visual elements that would be relevant for an image generation AI. Include information about:\n1. The main subject or subjects\n2. Composition and layout\n3. Lighting and atmosphere\n4. Colors and contrasts\n5. Textures and materials\n6. Style (e.g., photorealistic, abstract, cartoon)\n7. Any unique or standout features\n\nPhrase your description using clear, descriptive language that could be used as a prompt for generating a similar image. Avoid subjective interpretations or non-visual information. Aim for a concise yet comprehensive description and condense down in 2-3 sentences or 256 tokens.",
+        "enable",
+        "http://127.0.0.1:11434",
+        "llava:v1.6",
+        5
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 184,
+      "type": "LuminaDiffusersNode",
+      "pos": [
+        1365,
+        1937
+      ],
+      "size": {
+        "0": 400,
+        "1": 438
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latents",
+          "type": "LATENT",
+          "link": 280,
+          "slot_index": 0
+        },
+        {
+          "name": "prompt",
+          "type": "STRING",
+          "link": 284,
+          "widget": {
+            "name": "prompt"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            279
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LuminaDiffusersNode"
+      },
+      "widgets_values": [
+        "Alpha-VLLM/Lumina-Next-SFT-diffusers",
+        "",
+        "blurry, low quality, text",
+        40,
+        4,
+        1614,
+        "randomize",
+        1,
+        0.3,
+        true,
+        true,
+        256,
+        false,
+        1,
+        1
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 132,
+      "type": "LoadImage",
+      "pos": [
+        262,
+        1938
+      ],
+      "size": {
+        "0": 315,
+        "1": 314
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            283
+          ],
+          "shape": 3,
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": null,
+          "shape": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "1000_F_534825884_3syQmF310UusZnVfXsJGpqGB4N3UrKzk.jpg",
+        "image"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+    },
+    {
+      "id": 189,
+      "type": "ShowText|pysssss",
+      "pos": [
+        625,
+        2190
+      ],
+      "size": [
+        347.2938090395925,
+        228.56207143430538
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "text",
+          "type": "STRING",
+          "link": 286,
+          "widget": {
+            "name": "text"
+          }
+        }
+      ],
+      "outputs": [
+        {
+          "name": "STRING",
+          "type": "STRING",
+          "links": null,
+          "shape": 6
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ShowText|pysssss"
+      },
+      "widgets_values": [
+        "",
+        " The image is a colorful, vibrant stained glass window that captures the essence of an autumn scene. It features a forest landscape with trees displaying various shades of orange and yellow leaves, suggesting the fall season. The background consists of a clear sky above, with the trees stretching upwards to meet it. The light filtering through the stained glass creates a warm and inviting atmosphere. The colors in the image are rich and varied, with many shades of red, orange, yellow, and green used throughout the artwork. Textures within the artwork include the smooth lines and edges of the stained glass and the rougher textures of the trees and leaves. The style of the piece is realistic, with a focus on naturalistic representation. A standout feature is the intricate design and craftsmanship evident in the stained glass elements. "
+      ],
+      "color": "#2a363b",
+      "bgcolor": "#3f5159"
+    },
+    {
+      "id": 149,
+      "type": "CR SDXL Aspect Ratio",
+      "pos": [
+        1031,
+        1938
+      ],
+      "size": {
+        "0": 315,
+        "1": 278
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "upscale_factor",
+          "type": "FLOAT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "empty_latent",
+          "type": "LATENT",
+          "links": [
+            280
+          ],
+          "shape": 3,
+          "slot_index": 4
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "links": null,
+          "shape": 3,
+          "slot_index": 5
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CR SDXL Aspect Ratio"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        "16:9 landscape 1344x768",
+        "Off",
+        1,
+        1
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 98,
+      "type": "VAELoader",
+      "pos": [
+        1029,
+        2257
+      ],
+      "size": [
+        258.1387882070476,
+        58
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            175
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "SDXL-Fixed-vae-fp16.safetensors"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 141,
+      "type": "VAEDecode",
+      "pos": [
+        1029,
+        2357
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 279
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 175,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            241
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 142,
+      "type": "PreviewImage",
+      "pos": [
+        1790,
+        1935
+      ],
+      "size": [
+        1334.2679362054246,
+        789.8633634430871
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 241
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      175,
+      98,
+      0,
+      141,
+      1,
+      "VAE"
+    ],
+    [
+      241,
+      141,
+      0,
+      142,
+      0,
+      "IMAGE"
+    ],
+    [
+      279,
+      184,
+      0,
+      141,
+      0,
+      "LATENT"
+    ],
+    [
+      280,
+      149,
+      4,
+      184,
+      0,
+      "LATENT"
+    ],
+    [
+      283,
+      132,
+      0,
+      188,
+      0,
+      "IMAGE"
+    ],
+    [
+      284,
+      188,
+      0,
+      184,
+      1,
+      "STRING"
+    ],
+    [
+      286,
+      188,
+      0,
+      189,
+      0,
+      "STRING"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ds": {
+      "scale": 0.8769226950000021,
+      "offset": [
+        -171.17255117110597,
+        -1698.7544635951035
+      ]
+    }
+  },
+  "version": 0.4
+}

@@ -1,0 +1,288 @@
+{
+  "last_node_id": 192,
+  "last_link_id": 287,
+  "nodes": [
+    {
+      "id": 149,
+      "type": "CR SDXL Aspect Ratio",
+      "pos": [
+        1031,
+        1938
+      ],
+      "size": {
+        "0": 315,
+        "1": 278
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "width",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "height",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "upscale_factor",
+          "type": "FLOAT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "batch_size",
+          "type": "INT",
+          "links": null,
+          "shape": 3
+        },
+        {
+          "name": "empty_latent",
+          "type": "LATENT",
+          "links": [
+            280
+          ],
+          "shape": 3,
+          "slot_index": 4
+        },
+        {
+          "name": "show_help",
+          "type": "STRING",
+          "links": null,
+          "shape": 3,
+          "slot_index": 5
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CR SDXL Aspect Ratio"
+      },
+      "widgets_values": [
+        1024,
+        1024,
+        "16:9 landscape 1344x768",
+        "Off",
+        1,
+        1
+      ],
+      "color": "#323",
+      "bgcolor": "#535"
+    },
+    {
+      "id": 141,
+      "type": "VAEDecode",
+      "pos": [
+        1029,
+        2357
+      ],
+      "size": {
+        "0": 210,
+        "1": 46
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 279
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 175,
+          "slot_index": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            241
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      },
+      "color": "#322",
+      "bgcolor": "#533"
+    },
+    {
+      "id": 142,
+      "type": "PreviewImage",
+      "pos": [
+        1790,
+        1935
+      ],
+      "size": [
+        1334.2679362054246,
+        789.8633634430871
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 241
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PreviewImage"
+      },
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 184,
+      "type": "LuminaDiffusersNode",
+      "pos": [
+        1365,
+        1937
+      ],
+      "size": [
+        400,
+        458
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latents",
+          "type": "LATENT",
+          "link": 280,
+          "slot_index": 0
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            279
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LuminaDiffusersNode"
+      },
+      "widgets_values": [
+        "Alpha-VLLM/Lumina-Next-SFT-diffusers",
+        "Photo of artistic stone cup with 3D carvings, little dragon theme with forest background, decorated with amber accents, masterpiece of art, visually stunning, intricate details, sharp focus, 55mm f/ 1.8 lens, depth of field, natural daylight, diffuse lighting",
+        "blurry, low quality, text",
+        40,
+        4,
+        1561,
+        "randomize",
+        1,
+        0.3,
+        true,
+        true,
+        256,
+        false,
+        1,
+        1
+      ],
+      "color": "#232",
+      "bgcolor": "#353"
+    },
+    {
+      "id": 98,
+      "type": "VAELoader",
+      "pos": [
+        1029,
+        2257
+      ],
+      "size": [
+        313.4990726238925,
+        58
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            175
+          ],
+          "shape": 3,
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "SDXL-Fixed-vae-fp16.safetensors"
+      ],
+      "color": "#322",
+      "bgcolor": "#533"
+    }
+  ],
+  "links": [
+    [
+      175,
+      98,
+      0,
+      141,
+      1,
+      "VAE"
+    ],
+    [
+      241,
+      141,
+      0,
+      142,
+      0,
+      "IMAGE"
+    ],
+    [
+      279,
+      184,
+      0,
+      141,
+      0,
+      "LATENT"
+    ],
+    [
+      280,
+      149,
+      4,
+      184,
+      0,
+      "LATENT"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "0246.VERSION": [
+      0,
+      0,
+      4
+    ],
+    "ds": {
+      "scale": 0.8769226950000023,
+      "offset": [
+        -823.3394862961336,
+        -1697.2364122064232
+      ]
+    }
+  },
+  "version": 0.4
+}
