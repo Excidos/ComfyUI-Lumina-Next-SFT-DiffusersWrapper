@@ -30,6 +30,8 @@ For manual installation:
 
 ## Usage
 
+## Use with the standard SDXL_VAE or SDXL_Fixed_FP16-VAE
+
 1. Launch ComfyUI.
 2. Locate the "Lumina-Next-SFT Diffusers" node in the node selection menu.
 3. Add the node to your workflow.
